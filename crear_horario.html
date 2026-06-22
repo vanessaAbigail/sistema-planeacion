@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Crear Horario</title>
+</head>
+
+<body>
+
+<h2>Asignar Horario</h2>
+
+<select id="docente"></select>
+
+<input type="text" id="dia" placeholder="Día">
+<input type="text" id="hora" placeholder="Hora">
+<input type="text" id="materia" placeholder="Materia">
+<input type="text" id="grupo" placeholder="Grupo">
+
+<button onclick="guardar()">Guardar</button>
+
+<script>
+
+// cargar docentes
+fetch("http://localhost:3000/docentes")
+.then(res => res.json())
+.then(data => {
+
+let html = "";
+
+data.forEach(d => {
+html += `<option value="${d.id}">${d.nombre}</option>`;
+});
+
+document.getElementById("docente").innerHTML = html;
+
+});
+
+// guardar horario
+function guardar(){
+
+fetch("http://localhost:3000/guardar-horario", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({
+id_docente: docente.value,
+dia: dia.value,
+hora: hora.value,
+materia: materia.value,
+grupo: grupo.value
+})
+})
+.then(res => res.json())
+.then(data => {
+alert("Horario guardado");
+});
+
+}
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Administrador</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="panel-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN<br>ACADÉMICA</h3>
+</div>
+
+<!-- 🔥 ADMIN INFO BONITO -->
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoAdminSidebar" src="img/perfiles/default.png">
+
+<p id="nombreAdmin">Administrador</p>
+<span id="rolAdmin">Administrador</span>
+
+</div>
+</div>
+
+<ul>
+<li class="active"><a href="#">🏠 Menú</a></li>
+<li><a href="planeaciones_admin.html">📋 Planeaciones</a></li>
+<li><a href="docentes.html">👨‍🏫 Docentes</a></li>
+<li><a href="horarios_admin.html">⏰ Horarios</a></li>
+<li><a href="grupos.html">👥 Grupos / Asignaturas</a></li>
+<li><a href="perfil_admin.html">👤 Mi Perfil</a></li>
+<li><a href="#" onclick="cerrarSesion()">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">
+¡BIENVENIDO AL SISTEMA DE<br>
+PLANEACIÓN ACADÉMICA!
+</h1>
+
+<!-- PANEL -->
+<div class="user-panel">
+
+  <div class="notification" onclick="verNotificacionesAdmin()">
+🔔
+<span class="badge" id="contadorAdmin">0</span>
+</div>
+<img id="fotoAdmin" src="img/perfiles/default.png" class="user-icon" onclick="toggleMenuUsuario()">
+
+</div>
+
+<!-- MENÚ -->
+<div id="menuUsuario" class="menu-usuario">
+<a href="perfil_admin.html">👤 Mi Perfil</a>
+<a href="editar_perfil_admin.html">✏️ Editar Perfil</a>
+<a href="#" onclick="cerrarSesion()">🚪 Cerrar Sesión</a>
+</div>
+
+<!-- NOTIFICACIONES -->
+<div id="panelNotificaciones" class="panel-notificaciones">
+<p>📋 Nuevas planeaciones por revisar</p>
+<p>👨‍🏫 Nuevos docentes registrados</p>
+</div>
+
+<!-- TARJETAS -->
+<div class="cards">
+
+<a href="planeaciones_admin.html" class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png">
+<p>Planeaciones</p>
+</a>
+
+<a href="docentes.html" class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png">
+<p>Docentes</p>
+</a>
+
+<a href="horarios_admin.html" class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+<p>Horarios</p>
+</a>
+
+<a href="grupos.html" class="card">
+<img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+<p>Grupos / Asignaturas</p>
+</a>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔒 VALIDAR ADMIN
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario || usuario.tipo !== "administrador"){
+alert("Acceso solo administrador");
+window.location = "login.html";
+}
+
+const adminId = "admin";
+
+// 🔥 FUNCIÓN PRINCIPAL (TODO EN UNA)
+function iniciarDashboard(){
+
+// 🔥 NOMBRE
+const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+if(datos){
+document.getElementById("nombreAdmin").innerText = datos.nombre || "Administrador";
+document.getElementById("rolAdmin").innerText = "Administrador";
+}
+
+// 🔥 FOTO
+const foto = localStorage.getItem("foto_admin_" + adminId);
+
+if(foto){
+document.getElementById("fotoAdmin").src = foto;
+document.getElementById("fotoAdminSidebar").src = foto;
+}
+
+// 🔔 CARGAR NOTIFICACIONES
+cargarNotificacionesAdmin();
+
+}
+
+// 🔔 CARGAR NOTIFICACIONES
+function cargarNotificacionesAdmin(){
+
+fetch("http://localhost:3000/notificaciones/1")
+.then(res => res.json())
+.then(data => {
+
+document.getElementById("contadorAdmin").innerText = data.length;
+
+});
+
+}
+
+// 🔔 VER NOTIFICACIONES
+function verNotificacionesAdmin(){
+
+fetch("http://localhost:3000/notificaciones/1")
+.then(res => res.json())
+.then(data => {
+
+let mensajes = "";
+
+data.forEach(n => {
+mensajes += "• " + n.mensaje + "\n";
+});
+
+alert(mensajes || "Sin notificaciones");
+
+// 🔥 LIMPIAR
+fetch("http://localhost:3000/leer-notificaciones", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ id_usuario: 1 })
+})
+.then(() => {
+  document.getElementById("contadorAdmin").innerText = 0;
+});
+
+});
+
+}
+
+// 🔁 AUTO REFRESCO
+setInterval(() => {
+cargarNotificacionesAdmin();
+}, 5000);
+
+// 🔥 MENÚ
+function toggleMenu(){
+let menu = document.getElementById("menuUsuario");
+menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// 🔥 CERRAR SESIÓN
+function cerrarSesion(){
+localStorage.removeItem("usuario");
+window.location = "login.html";
+}
+
+// 🔥 CERRAR MENÚ AL HACER CLICK FUERA
+document.addEventListener("click", function(e){
+if(!e.target.closest(".user-panel")){
+document.getElementById("menuUsuario").style.display = "none";
+document.getElementById("panelNotificaciones").style.display = "none";
+}
+});
+
+// 🚀 INICIAR TODO
+window.onload = iniciarDashboard;
+
+function toggleMenuUsuario(){
+let menu = document.getElementById("menuUsuario");
+menu.style.display =
+menu.style.display === "block" ? "none" : "block";
+}
+
+function toggleMenu(){
+document.querySelector(".sidebar").classList.toggle("activo");
+}
+
+</script>
+
+<button class="menu-toggle" onclick="toggleMenu()">
+☰
+</button>
+</body>
+</html>

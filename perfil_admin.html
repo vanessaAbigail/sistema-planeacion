@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Perfil Administrador</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="panel-body">
+
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<ul>
+<li><a href="dashboard_admin.html">🏠 Menú</a></li>
+<li><a href="planeaciones_admin.html">📋 Planeaciones</a></li>
+<li><a href="docentes.html">👨‍🏫 Docentes</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="grupos.html">👥 Grupos / Asignaturas</a></li>
+<li><a href="perfil_admin.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<div class="contenido">
+
+<h1 class="titulo">Perfil Administrador</h1>
+
+<!-- PANEL -->
+<div class="user-panel">
+
+<img id="fotoUsuario" src="img/perfiles/default.png" class="user-icon" onclick="toggleMenu()">
+
+<div id="menuUsuario" class="menu-usuario">
+<a href="editar_perfil_admin.html">✏️ Editar perfil</a>
+<a href="login.html">🚪 Cerrar sesión</a>
+</div>
+
+</div>
+
+<div class="perfil-card">
+
+<div class="perfil-info">
+
+<div class="foto">
+<img id="fotoPerfil" src="img/perfiles/default.png" class="img-perfil">
+</div>
+
+<div class="datos" id="datosPerfil">
+<p><b>Administrador:</b> ---</p>
+<p><b>Correo:</b> ---</p>
+<p><b>Teléfono:</b> ---</p>
+<p><b>Área:</b> ---</p>
+<p><b>ID:</b> ---</p>
+<p><b>Rol:</b> ---</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- 🔥 BOTONES FLOTANTES -->
+<div class="botones-flotantes">
+
+<a href="editar_perfil_admin.html" class="btn-flotante">
+✏️ Editar
+</a>
+
+<a href="dashboard_admin.html" class="btn-flotante">
+🏠 Menú
+</a>
+
+</div>
+
+<script>
+
+const adminId = "admin";
+
+// 🔥 CARGAR DATOS
+window.onload = function(){
+
+const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+if(datos){
+document.getElementById("datosPerfil").innerHTML = `
+<p><b>Administrador:</b> ${datos.nombre}</p>
+<p><b>Correo:</b> ${datos.correo}</p>
+<p><b>Teléfono:</b> ${datos.telefono}</p>
+<p><b>Área:</b> ${datos.area || '---'}</p>
+<p><b>ID:</b> ${datos.matricula || '---'}</p>
+<p><b>Rol:</b> ${datos.rol || 'Administrador'}</p>
+`;
+}
+
+// 🔥 FOTO
+const foto = localStorage.getItem("foto_admin_" + adminId);
+
+if(foto){
+document.getElementById("fotoPerfil").src = foto;
+document.getElementById("fotoUsuario").src = foto;
+}
+
+}
+
+// 🔥 MENÚ
+function toggleMenu(){
+let menu = document.getElementById("menuUsuario");
+menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Agregar Clase</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="panel-body">
+
+<div class="sidebar">
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoDocenteSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreDocenteSidebar">
+Docente
+</p>
+
+<span id="rolDocenteSidebar">
+Docente
+</span>
+
+</div>
+</div>
+<ul>
+<li><a href="dashboard.html">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html">✏️ Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+</div>
+
+<div class="contenido">
+
+<h1 class="titulo">📚 Agregar Clase</h1>
+
+<div class="form-container">
+
+<form class="form-planeacion">
+
+<div class="campo">
+<label>Periodo</label>
+<input type="text" id="periodo" placeholder="Ej: 2026-1">
+</div>
+
+<div class="campo">
+<label>Día</label>
+<select id="dia">
+<option>Lunes</option>
+<option>Martes</option>
+<option>Miércoles</option>
+<option>Jueves</option>
+<option>Viernes</option>
+</select>
+</div>
+
+<div class="campo">
+<label>Hora</label>
+<input type="text" id="hora" placeholder="Ej: 7:00 - 8:00">
+</div>
+
+<div class="campo">
+<label>Materia</label>
+<input type="text" id="materia">
+</div>
+
+<div class="campo">
+<label>Aula</label>
+<input type="text" id="aula">
+</div>
+
+<div class="campo">
+<label>Carrera</label>
+<input type="text" id="carrera" placeholder="Ej: Ingeniería en Sistemas">
+</div>
+
+<div class="campo campo-full">
+<button class="btn-guardar">Agregar Clase</button>
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+const API = "http://localhost:3000";
+
+// 🔥 USUARIO ACTUAL
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+document.querySelector(".form-planeacion").addEventListener("submit", function(e){
+e.preventDefault();
+
+let periodo = document.getElementById("periodo").value;
+let dia = document.getElementById("dia").value;
+let hora = document.getElementById("hora").value;
+let materia = document.getElementById("materia").value;
+let aula = document.getElementById("aula").value;
+let carrera = document.getElementById("carrera").value;
+
+// 🔥 VALIDACIÓN
+if(!periodo || !hora || !materia || !aula || !carrera){
+alert("Completa todos los campos ❌");
+return;
+}
+
+// ==========================
+// 🔥 1. GUARDAR LOCAL (NO LO QUITÉ)
+let clases = JSON.parse(localStorage.getItem("horarios")) || [];
+
+clases.push({periodo, dia, hora, materia, aula, carrera});
+
+localStorage.setItem("horarios", JSON.stringify(clases));
+
+// ==========================
+// 🔥 2. GUARDAR EN MYSQL
+fetch(API + "/guardar-horario", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+id_docente: usuario.id,
+periodo: periodo,
+dia: dia,
+hora: hora,
+materia: materia,
+grupo: aula,
+carrera: carrera
+})
+})
+.then(res => res.json())
+.then(data => {
+console.log("RESPUESTA SERVER:", data);
+})
+.catch(err => {
+console.log("ERROR:", err);
+});
+
+alert("Clase agregada correctamente ✅");
+
+window.location = "horarios.html";
+
+});
+
+
+const datosPerfil =
+JSON.parse(localStorage.getItem("perfil_" + usuario.id));
+
+if(datosPerfil){
+
+document.getElementById("nombreDocenteSidebar").innerText =
+datosPerfil.nombre || "Docente";
+
+}
+
+const fotoGuardada =
+localStorage.getItem("fotoPerfil_" + usuario.id);
+
+if(
+fotoGuardada &&
+fotoGuardada !== "null" &&
+fotoGuardada !== "undefined"
+){
+
+document.getElementById("fotoDocenteSidebar").src =
+fotoGuardada;
+
+}
+
+</script>
+
+</body>
+</html>

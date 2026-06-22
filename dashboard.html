@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Panel - Sistema de Planeación</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+
+<body class="panel-body">
+
+<button class="menu-toggle" onclick="toggleSidebar()">
+☰
+</button>
+
+<!-- HEADER -->
+<header class="header">
+
+    <!-- ICONOS DERECHA -->
+    <div class="right-icons">
+
+        <!-- NOTIFICACIONES -->
+        <div class="notification" onclick="verNotificaciones()">
+            🔔
+            <span class="badge" id="contador">0</span>
+        </div>
+
+        <!-- FOTO PERFIL -->
+        <img
+            id="fotoUsuario"
+            src="img/perfiles/default.png"
+            alt="Foto usuario"
+            class="user-img"
+            onclick="toggleMenu()"
+        >
+
+    </div>
+
+</header>
+
+<!-- 🔥 SIDEBAR -->
+<div class="sidebar" id="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg" alt="Logo">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoDocenteSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreDocenteSidebar">
+    Docentes
+</p>
+
+<span id="rolDocenteSidebar">
+Docente
+</span>
+
+</div>
+</div>
+
+<ul>
+
+<li>
+<a href="dashboard.html" class="active">
+🏠 Menú
+</a>
+</li>
+
+<li>
+<a href="crear_planeacion.html">
+✏️ Crear Planeación
+</a>
+</li>
+
+<li>
+<a href="ver_planeaciones.html">
+📄 Ver Planeaciones
+</a>
+</li>
+
+<li>
+<a href="horarios.html">
+⏰ Horarios
+</a>
+</li>
+
+<li>
+<a href="perfil.html">
+👤 Mi Perfil
+</a>
+</li>
+
+<li>
+<a href="login.html">
+🚪 Cerrar Sesión
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<!-- 🔥 CONTENIDO -->
+<div class="contenido">
+
+    <h1 class="titulo">
+¡BIENVENIDO AL SISTEMA DE<br>
+PLANEACIÓN ACADÉMICA!
+</h1>
+
+<!-- 🔥 MENÚ USUARIO -->
+<div id="menuUsuario" class="menu-usuario">
+
+<a href="perfil.html">
+👤 Mi Perfil
+</a>
+
+<a href="editar_perfil.html">
+✏️ Editar Perfil
+</a>
+
+<a href="login.html">
+🚪 Cerrar Sesión
+</a>
+
+</div>
+
+<!-- 🔥 DASHBOARD -->
+
+<div class="cards">
+
+<!-- CARD PERFIL -->
+<div class="card" onclick="location.href='perfil.html'">
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png"
+alt="Perfil"
+>
+
+<p>Mi Perfil</p>
+
+</div>
+
+<!-- CARD VER -->
+<div class="card" onclick="location.href='ver_planeaciones.html'">
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png"
+alt="Planeaciones"
+>
+
+<p>Ver Planeaciones</p>
+
+</div>
+
+<!-- CARD CREAR -->
+<div class="card" onclick="location.href='crear_planeacion.html'">
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png"
+alt="Crear"
+>
+
+<p>Crear Planeación</p>
+
+</div>
+
+<!-- CARD HORARIOS -->
+<div class="card" onclick="location.href='horarios.html'">
+
+<img
+src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
+alt="Horarios"
+>
+
+<p>Horarios</p>
+
+</div>
+
+</div>
+
+<!-- 🔥 SCRIPT -->
+<script>
+
+/* =========================================
+🔥 API
+========================================= */
+
+const API = "http://localhost:3000";
+
+
+/* =========================================
+🔥 PROTEGER DASHBOARD
+========================================= */
+
+const rol = localStorage.getItem("rol");
+
+if(rol !== "docente"){
+
+alert("⚠️ No tienes acceso a esta sección");
+
+window.location = "login.html";
+
+}
+
+
+/* =========================================
+🔥 USUARIO
+========================================= */
+
+const usuario =
+JSON.parse(localStorage.getItem("usuario")) || {};
+
+const userId = usuario.id || "default";
+
+const datosPerfil =
+JSON.parse(
+localStorage.getItem("perfil_" + usuario.id)
+);
+
+if(datosPerfil){
+
+document.getElementById("nombreDocenteSidebar").innerText =
+datosPerfil.nombre || "Docente";
+
+}
+
+
+
+const fotoGuardada =
+localStorage.getItem(
+"fotoPerfil_" + usuario.id
+);
+
+if(fotoGuardada){
+
+document.getElementById("fotoDocenteSidebar").src =
+fotoGuardada;
+
+document.getElementById("fotoUsuario").src =
+fotoGuardada;
+
+}
+/* =========================================
+🔥 CARGAR FOTO
+========================================= */
+
+function cargarFotoDashboard(){
+
+
+
+const foto = localStorage.getItem("fotoPerfil_" + userId);
+
+if(
+foto &&
+foto !== "null" &&
+foto !== "undefined"
+){
+
+// Foto arriba derecha
+document.getElementById("fotoUsuario").src = foto;
+
+// Foto del sidebar
+document.getElementById("fotoDocenteSidebar").src = foto;
+
+}
+
+}
+/* =========================================
+🔥 CARGAR NOTIFICACIONES
+========================================= */
+
+function cargarNotificaciones(){
+
+fetch(`${API}/notificaciones/${usuario.id}`)
+
+.then(res => res.json())
+
+.then(data => {
+
+const contador =
+document.getElementById("contador");
+
+if(contador){
+
+contador.innerText = data.length;
+
+}
+
+})
+
+.catch(error => {
+
+console.log("Error notificaciones:", error);
+
+});
+
+}
+
+
+/* =========================================
+🔥 CARGA INICIAL
+========================================= */
+
+window.onload = function(){
+
+cargarFotoDashboard();
+
+cargarNotificaciones();
+
+};
+
+
+/* =========================================
+🔥 ACTUALIZAR FOTO AUTOMÁTICA
+========================================= */
+
+window.addEventListener("storage", function(e){
+
+if(
+e.key &&
+e.key.includes("fotoPerfil_")
+){
+
+cargarFotoDashboard();
+
+}
+
+});
+
+
+/* =========================================
+🔥 TOGGLE MENÚ USUARIO
+========================================= */
+
+function toggleMenu(){
+
+const menu =
+document.getElementById("menuUsuario");
+
+menu.style.display =
+menu.style.display === "block"
+? "none"
+: "block";
+
+}
+
+
+/* =========================================
+🔥 VER NOTIFICACIONES
+========================================= */
+
+function verNotificaciones(){
+
+fetch(`${API}/notificaciones/${usuario.id}`)
+
+.then(res => res.json())
+
+.then(data => {
+
+let mensajes = "";
+
+data.forEach(n => {
+
+mensajes += "• " + n.mensaje + "\n";
+
+});
+
+alert(mensajes || "Sin notificaciones");
+
+
+/* MARCAR COMO LEÍDAS */
+
+fetch(`${API}/leer-notificaciones`, {
+
+method: "POST",
+
+headers: {
+"Content-Type": "application/json"
+},
+
+body: JSON.stringify({
+id_usuario: usuario.id
+})
+
+})
+
+.then(() => {
+
+document.getElementById("contador").innerText = 0;
+
+});
+
+})
+
+.catch(error => {
+
+console.log("Error:", error);
+
+});
+
+}
+
+
+/* =========================================
+🔥 CERRAR MENÚ
+========================================= */
+
+window.addEventListener("click", function(e){
+
+if(
+
+!e.target.closest(".right-icons") &&
+!e.target.closest(".menu-usuario")
+
+){
+
+document.getElementById("menuUsuario")
+.style.display = "none";
+
+}
+
+});
+
+
+
+function toggleMenuUsuario(){
+let menu = document.getElementById("menuUsuario");
+menu.style.display =
+menu.style.display === "block" ? "none" : "block";
+}
+
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("activo");
+}
+
+</script>
+</body>
+</html>

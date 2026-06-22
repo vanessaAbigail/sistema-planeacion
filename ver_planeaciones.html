@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Ver Planeación</title>
+<link rel="stylesheet" href="style.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="panel-body">
+
+<div class="sidebar">
+
+<div class="logo-panel"> 
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoDocenteSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreDocenteSidebar">
+Docente
+</p>
+
+<span id="rolDocenteSidebar">
+Docente
+</span>
+
+</div>
+</div>
+
+<ul>
+<li><a href="dashboard.html">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html">✏️ Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html" class="active">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<div class="contenido">
+
+ <div class="encabezado-seccion">
+
+<h1>📄 Ver Planeaciones</h1>
+
+<p>
+Consulta, edita y administra tus planeaciones académicas.
+</p>
+
+</div>
+
+
+<div class="planeaciones-container">
+
+<!-- TARJETAS -->
+<div class="stats-container">
+
+<div class="estado-card">
+<img src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
+<h3>Pendientes</h3>
+<p class="numero" id="contPendientes">0</p>
+<button class="btn-estado" onclick="filtrarEstado('pendiente')">Ver detalles</button>
+</div>
+
+<div class="estado-card">
+<img src="https://cdn-icons-png.flaticon.com/512/190/190411.png">
+<h3>Aprobadas</h3>
+<p class="numero" id="contAprobadas">0</p>
+<button class="btn-estado" onclick="filtrarEstado('aprobado')">Ver detalles</button>
+</div>
+
+<div class="estado-card">
+<img src="https://cdn-icons-png.flaticon.com/512/463/463612.png">
+<h3>Rechazadas</h3>
+<p class="numero" id="contRechazadas">0</p>
+<button class="btn-estado" onclick="filtrarEstado('rechazado')">Ver detalles</button>
+</div>
+
+</div>
+
+
+
+<div class="tabla-box">
+
+<div class="barra-superior">
+
+<input
+type="text"
+id="buscar"
+placeholder="🔍 Buscar planeación..."
+>
+
+</div>
+
+<table class="tabla">
+<thead>
+<tr>
+<th>Periodo</th>
+<th>Carrera</th>
+<th>Grupo</th>
+<th>Materia</th>
+<th>Fecha</th>
+<th>Archivo</th>
+<th>Estado</th>
+<th>Acciones</th>
+</tr>
+</thead>
+
+<tbody id="tablaPlaneaciones"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<!-- 🔥 VISOR PRO -->
+<div id="visor" class="visor-overlay">
+  <div class="visor-contenido">
+    <div class="visor-header">
+      <span>📄 Vista previa del documento</span>
+      <button onclick="cerrarVisor()">❌</button>
+    </div>
+    <iframe id="frameDoc"></iframe>
+  </div>
+</div>
+
+<script>
+
+// 🔒 PROTEGER DOCENTE
+const rol = localStorage.getItem("rol");
+
+const esAdmin = rol === "administrador";
+
+if(rol !== "docente"){
+  alert("⚠️ No tienes acceso a esta sección");
+  window.location = "login.html";
+}
+
+// 🔥 USUARIO ACTUAL
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+// 🔥 CARGAR SOLO SUS PLANEACIONES
+function cargar(){
+fetch("http://localhost:3000/planeaciones-docente/" + usuario.id)
+.then(res => res.json())
+.then(data => {
+
+let tabla = document.getElementById("tablaPlaneaciones");
+tabla.innerHTML = "";
+
+let pendientes = 0;
+let aprobadas = 0;
+let rechazadas = 0;
+
+data.forEach(p => {
+
+let estado = p.estado.toLowerCase();
+if(estado.includes("pendiente")) pendientes++;
+if(estado.includes("aprobado")) aprobadas++;
+if(estado.includes("rechazado")) rechazadas++;
+
+tabla.innerHTML += `
+<tr>
+<td>${p.periodo}</td>
+<td>${p.carrera}</td>
+<td>${p.grupo}</td>
+<td>${p.materia}</td>
+<td>${new Date(p.fecha).toLocaleDateString('es-MX')}</td>
+
+<td>
+${p.archivo 
+? `<button onclick="verDocumento('${p.archivo}')">📄 Ver</button>`
+: 'Sin archivo'}
+</td>
+
+<td>
+<span>${p.estado}</span>
+</td>
+
+<td>
+
+<button onclick="editar(${p.id})">✏️</button>
+<button onclick="eliminar(${p.id})">🗑️</button>
+
+${esAdmin ? `
+<button onclick="cambiarEstado(${p.id}, 'Aprobado')">✅</button>
+<button onclick="cambiarEstado(${p.id}, 'Rechazado')">❌</button>
+` : ''}
+
+</td>
+</tr>
+`;
+
+});
+
+document.getElementById("contPendientes").innerText = pendientes;
+document.getElementById("contAprobadas").innerText = aprobadas;
+document.getElementById("contRechazadas").innerText = rechazadas;
+
+});
+}
+
+cargar();
+
+// 🔥 VISOR
+function verDocumento(archivo){
+document.getElementById("visor").style.display = "flex";
+document.getElementById("frameDoc").src = "http://localhost:3000/uploads/" + archivo;
+}
+
+function cerrarVisor(){
+document.getElementById("visor").style.display = "none";
+document.getElementById("frameDoc").src = "";
+}
+
+// 🔍 FILTROS
+function filtrarEstado(estado){
+let filas = document.querySelectorAll("#tablaPlaneaciones tr");
+filas.forEach(fila=>{
+let estadoFila = fila.children[6].innerText.toLowerCase();
+fila.style.display = estadoFila.includes(estado) ? "" : "none";
+});
+}
+
+function buscar(){
+
+let input =
+document.getElementById("buscar")
+.value
+.toLowerCase();
+
+let filas =
+document.querySelectorAll("#tablaPlaneaciones tr");
+
+filas.forEach(fila=>{
+
+let texto = fila.innerText.toLowerCase();
+
+fila.style.display =
+texto.includes(input)
+? ""
+: "none";
+
+});
+
+}
+
+document
+.getElementById("buscar")
+.addEventListener("keyup", buscar);
+
+// 🔥 ELIMINAR
+function eliminar(id){
+if(confirm("¿Eliminar planeación?")){
+fetch("http://localhost:3000/eliminar-planeacion/"+id,{method:"DELETE"})
+.then(res=>res.text())
+.then(data=>{
+if(data==="ok"){
+alert("Eliminado ✅");
+cargar();
+}else{
+alert("Error ❌");
+}
+});
+}
+}
+
+// 🔥 EDITAR
+function editar(id){
+window.location="editar_planeacion.html?id="+id;
+}
+
+function cambiarEstado(id, estado){
+
+fetch("http://localhost:3000/estado-planeacion/" + id, {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ estado })
+})
+.then(res => res.json())
+.then(res => {
+  alert(res.mensaje);
+  cargar();
+});
+
+}
+
+const datosPerfil =
+JSON.parse(localStorage.getItem("perfil_" + usuario.id));
+
+if(datosPerfil){
+
+document.getElementById("nombreDocenteSidebar").innerText =
+datosPerfil.nombre || "Docente";
+
+}
+
+const fotoGuardada =
+localStorage.getItem("fotoPerfil_" + usuario.id);
+
+if(
+fotoGuardada &&
+fotoGuardada !== "null" &&
+fotoGuardada !== "undefined"
+){
+
+document.getElementById("fotoDocenteSidebar").src =
+fotoGuardada;
+
+}
+</script>
+<a href="dashboard.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>
+
+</div>
+</div>

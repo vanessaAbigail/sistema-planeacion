@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Editar Perfil</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="panel-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<ul>
+<li><a href="dashboard.html">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html">✏️Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li class="active"><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">Editar Perfil</h1>
+
+<!-- PANEL (SIN CAMPANA) -->
+<div class="user-panel">
+
+<img id="fotoUsuario" src="img/perfiles/default.png" class="user-icon" onclick="toggleMenu()">
+
+<div id="menuUsuario" class="menu-usuario">
+<a href="perfil.html">👤 Mi Perfil</a>
+<a href="editar_perfil.html">✏️ Editar Perfil</a>
+<a href="login.html">🚪 Cerrar Sesión</a>
+</div>
+
+</div>
+
+<!-- FORM -->
+<div class="editar-perfil moderno">
+
+<div class="foto-editar">
+
+<img id="preview"
+src="img/perfiles/default.png"
+class="img-perfil-editar">
+
+<h2 id="nombreVista">
+Docente
+</h2>
+
+<p class="cargo-editar">
+Docente
+</p>
+
+<input type="file" id="inputFoto" style="display:none">
+
+<button
+type="button"
+class="btn-foto"
+onclick="document.getElementById('inputFoto').click()">
+
+📷 Cambiar Foto
+
+</button>
+
+</div>
+
+<form class="form-editar"
+onsubmit="guardarPerfil(event)">
+
+<label>Nombre Completo</label>
+<input type="text" id="nombre">
+
+<label>Fecha de Nacimiento</label>
+<input type="date" id="fecha">
+
+<label>CURP</label>
+<input type="text" id="curp">
+
+<label>Teléfono</label>
+<input type="text" id="telefono">
+
+<label>Correo Electrónico</label>
+<input type="email" id="correo">
+
+<label>Matrícula</label>
+<input type="text" id="matricula">
+
+<label>Género</label>
+<select id="genero">
+<option>Femenino</option>
+<option>Masculino</option>
+</select>
+
+<div class="acciones-editar">
+
+<button type="submit" class="btn-guardar">
+💾 Guardar
+</button>
+
+<button
+type="button"
+class="btn-regresar"
+onclick="window.location.href='perfil.html'">
+↩️ Regresar
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+// ============================
+// USUARIO
+// ============================
+
+const usuario = JSON.parse(localStorage.getItem("usuario")) || {};
+let userId = usuario.id || "default";
+
+// ELEMENTOS
+const preview = document.getElementById("preview");
+const fotoUsuario = document.getElementById("fotoUsuario");
+
+// ============================
+// MENÚ
+// ============================
+
+function toggleMenu(){
+
+let menu = document.getElementById("menuUsuario");
+
+menu.style.display =
+menu.style.display === "block"
+? "none"
+: "block";
+
+}
+
+// ============================
+// CAMBIAR FOTO
+// ============================
+
+document.getElementById("inputFoto").addEventListener("change", function(e){
+
+const file = e.target.files[0];
+
+if(file){
+
+const reader = new FileReader();
+
+reader.onload = function(event){
+
+const img = event.target.result;
+
+// Vista previa
+preview.src = img;
+fotoUsuario.src = img;
+
+// Guardar foto
+localStorage.setItem(
+"fotoPerfil_" + userId,
+img
+);
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+});
+
+// ============================
+// GUARDAR PERFIL
+// ============================
+
+function guardarPerfil(e){
+
+e.preventDefault();
+
+const datos = {
+
+nombre: document.getElementById("nombre").value,
+fecha: document.getElementById("fecha").value,
+curp: document.getElementById("curp").value,
+telefono: document.getElementById("telefono").value,
+correo: document.getElementById("correo").value,
+matricula: document.getElementById("matricula").value,
+genero: document.getElementById("genero").value
+
+};
+
+localStorage.setItem(
+"perfil_" + userId,
+JSON.stringify(datos)
+);
+
+alert("Perfil guardado correctamente ✅");
+
+window.location.href = "perfil.html";
+
+}
+
+// ============================
+// CARGAR DATOS
+// ============================
+
+window.onload = function(){
+
+const datos = JSON.parse(
+localStorage.getItem("perfil_" + userId)
+);
+
+if(datos){
+
+document.getElementById("nombre").value =
+datos.nombre || "";
+
+document.getElementById("fecha").value =
+datos.fecha || "";
+
+document.getElementById("curp").value =
+datos.curp || "";
+
+document.getElementById("telefono").value =
+datos.telefono || "";
+
+document.getElementById("correo").value =
+datos.correo || "";
+
+document.getElementById("matricula").value =
+datos.matricula || "";
+
+document.getElementById("genero").value =
+datos.genero || "";
+
+document.getElementById("nombreVista").innerText =
+datos.nombre || "Docente";
+
+}
+
+// CARGAR FOTO
+const foto = localStorage.getItem(
+"fotoPerfil_" + userId
+);
+
+if(foto){
+
+preview.src = foto;
+fotoUsuario.src = foto;
+
+}
+
+};
+
+</script>
+<a href="dashboard.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>

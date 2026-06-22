@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Mi Perfil</title>
+<link rel="stylesheet" href="style.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body class="panel-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<ul>
+<li><a href="dashboard.html">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html">✏️ Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li class="active"><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO CENTRAL -->
+<div class="contenido">
+
+<h1 class="titulo">Mi Perfil</h1>
+
+<!-- PANEL USUARIO -->
+<div class="user-panel">
+<img id="fotoUsuario" src="img/perfiles/default.png" class="user-icon" onclick="toggleMenu()">
+</div>
+
+<!-- MENÚ -->
+<div id="menuUsuario" class="menu-usuario">
+<a href="perfil.html">👤 Ver Perfil</a>
+<a href="editar_perfil.html">✏️ Editar Perfil</a>
+<a href="login.html">🚪 Cerrar sesión</a>
+</div>
+
+<!-- TARJETA PERFIL -->
+<div class="perfil-card perfil-moderno">
+
+<div class="perfil-info">
+
+<div class="foto">
+
+<img
+id="fotoPerfil"
+src="img/perfiles/default.png"
+class="img-perfil"
+>
+
+<h2 id="nombreCompletoPerfil">
+Docente
+</h2>
+
+<p class="cargo-docente">
+Docente
+</p>
+
+</div>
+<div class="datos" id="datosPerfil">
+<p><span class="titulo-dato">Docente:</span> ---</p>
+<p><span class="titulo-dato">Fecha de nacimiento:</span> ---</p>
+<p><span class="titulo-dato">CURP:</span> ---</p>
+<p><span class="titulo-dato">No. teléfono:</span> ---</p>
+<p><span class="titulo-dato">Correo:</span> ---</p>
+<p><span class="titulo-dato">Matrícula:</span> ---</p>
+<p><span class="titulo-dato">Género:</span> ---</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+
+<!-- 🔥 BOTÓN FLOTANTE -->
+
+<div class="botones-perfil">
+
+<button class="btn-menu" onclick="window.location.href='dashboard.html'">
+🏠 Menú
+</button>
+
+<button class="btn-editar" onclick="window.location.href='editar_perfil.html'">
+✏️ Editar
+</button>
+
+</div>
+
+<script>
+
+// USUARIO
+const usuario = JSON.parse(localStorage.getItem("usuario")) || {};
+let userId = usuario.id || "default";
+
+// MENÚ
+function toggleMenu(){
+let menu = document.getElementById("menuUsuario");
+menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// CERRAR MENÚ FUERA
+window.addEventListener("click", function(e){
+if(!e.target.closest(".user-panel")){
+document.getElementById("menuUsuario").style.display = "none";
+}
+});
+
+// CARGAR PERFIL
+const datos = JSON.parse(localStorage.getItem("perfil_" + userId));
+
+if(datos){
+document.getElementById("nombreCompletoPerfil").innerText =
+datos.nombre;
+
+document.getElementById("datosPerfil").innerHTML = `
+
+<p>
+<span class="titulo-dato">📅 Fecha de nacimiento</span>
+${datos.fecha}
+</p>
+
+<p>
+<span class="titulo-dato">🆔 CURP</span>
+${datos.curp}
+</p>
+
+<p>
+<span class="titulo-dato">📱 Teléfono</span>
+${datos.telefono}
+</p>
+
+<p>
+<span class="titulo-dato">📧 Correo</span>
+${datos.correo}
+</p>
+
+<p>
+<span class="titulo-dato">🎓 Matrícula</span>
+${datos.matricula}
+</p>
+
+<p>
+<span class="titulo-dato">👤 Género</span>
+${datos.genero}
+</p>
+
+`;
+}
+
+// CARGAR FOTO
+const foto = localStorage.getItem("fotoPerfil_" + userId);
+
+if(foto && foto !== "null" && foto !== "undefined"){
+document.getElementById("fotoPerfil").src = foto;
+document.getElementById("fotoUsuario").src = foto;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Recuperar contraseña</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="login-body">
+
+
+<div class="login-box">
+
+<h2>🔒</h2>
+
+<h2>Recuperar contraseña</h2>
+
+<p>
+Recibe un código de verificación para
+restablecer tu acceso al sistema.
+</p>
+
+
+<input
+type="email"
+id="correo"
+placeholder="Correo institucional"
+>
+
+<button onclick="enviarCodigo()">
+Enviar código
+</button>
+
+<input
+type="text"
+id="codigo"
+placeholder="Código de verificación"
+maxlength="6"
+>
+
+<input
+type="password"
+id="nueva"
+placeholder="Nueva contraseña"
+>
+
+<button onclick="cambiarPassword()">
+Actualizar contraseña
+</button>
+
+</div>
+
+<script>
+
+async function enviarCodigo(){
+
+  const correo =
+  document.getElementById("correo").value;
+
+  const res = await fetch("/enviar-codigo",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      correo
+    })
+  });
+
+  const data = await res.json();
+
+  alert(data.mensaje);
+
+}
+
+async function cambiarPassword(){
+
+  const correo =
+  document.getElementById("correo").value;
+
+  const codigo =
+  document.getElementById("codigo").value;
+
+  const nueva =
+  document.getElementById("nueva").value;
+
+  const res = await fetch("/verificar-codigo",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      correo,
+      codigo,
+      nueva
+    })
+  });
+
+  const data = await res.json();
+
+  alert(data.mensaje);
+
+  if(data.status === "ok"){
+    window.location.href="login.html";
+  }
+
+}
+
+</script>
+</body>
+</html>

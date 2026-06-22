@@ -1,0 +1,2190 @@
+/* 🔥 RESET */
+body{
+margin:0;
+font-family:Arial;
+}
+/* 🔹 LOGIN / RECUPERAR */
+body.login-body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background-image:url("img/fondo.jpg");
+background-size:cover;
+background-position:center;
+}
+
+.login-box{
+width:400px;
+padding:30px;
+text-align:center;
+
+background:rgba(255,255,255,0.85);
+backdrop-filter:blur(15px);
+
+border-radius:25px;
+
+box-shadow:
+0 15px 35px rgba(0,0,0,.20);
+
+animation: aparecer .6s ease;
+}
+
+@keyframes aparecer{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:15px;
+border-radius:10px;
+border:1px solid #dcdcdc;
+font-size:14px;
+box-sizing:border-box;
+}
+
+input:focus{
+outline:none;
+border-color:#149b1d;
+box-shadow:0 0 10px rgba(27,94,32,.2);
+}
+
+button{
+width:auto;
+padding:10px 20px;
+border:none;
+border-radius:12px;
+background:#149b1d;
+color:white;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+margin-bottom:10px;
+}
+button:hover{
+transform:translateY(-2px);
+background:#149b1d;
+}
+
+.card:hover{
+transform:scale(1.05);
+}
+
+
+/* 🔥 TARJETAS ESTADO DOCENTE*/
+.estado-contenedor{
+display:flex;
+justify-content:center;
+gap:30px;
+flex-wrap:wrap;
+margin-top:20px;
+margin-bottom:60px; /* ← separación con la tabla */
+}
+
+.estado-card{
+background:white;
+padding:25px;
+border-radius:15px;
+text-align:center;
+width:200px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+.estado-card img{
+width:50px;
+margin-bottom:15px;
+}
+
+.estado-card h3{
+margin:5px 0;
+font-size:18px;
+color:#333;
+}
+
+.numero{
+font-size:28px;
+font-weight:bold;
+color:#149b1d;
+margin:5px 0 10px 0;
+}
+
+.btn-estado{
+margin-top:20px;
+padding:8px 12px;
+border:none;
+background:#149b1d;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+
+.btn-estado:hover{
+background:#149b1d;
+}
+
+/* 🔥 TABLA siii buenaaa*/
+.tabla-box{
+background:white;
+padding:25px;
+border-radius:25px;
+
+width: calc(100% - 60px);
+margin:30px auto;
+    overflow-x: auto;
+
+   position: relative;
+    left: 5px;
+
+
+box-sizing:border-box;
+margin-left:40px;
+}
+
+.tabla{
+width:90%;
+margin:auto;
+border-collapse:collapse;
+}
+
+/* TABLA DOCENTES administrador */
+.tabla{
+width:200%;
+table-layout:fixed;
+}
+
+.tabla td,
+.tabla th{
+padding:12px;
+font-size:14px;
+}
+
+#buscador{
+    width:300px;
+    max-width:80%;
+    display:block;
+    margin:20px auto;
+}
+
+.tabla th{
+background:#149b1d;
+color:white;
+padding:20px;
+}
+
+.tabla td{
+padding:10px;
+border-bottom:5px solid #ddd;
+text-align:center;
+}
+
+/* ===== VISOR DOCUMENTOS ===== */
+
+.visor-overlay{
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.8);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.visor-contenido{
+    width:95%;
+    height:90%;
+    background:#fff;
+    border-radius:15px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.visor-header{
+    background:#2e7d32;
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.visor-header button{
+    background:red;
+    color:white;
+    border:none;
+    width:40px;
+    height:40px;
+    font-size:20px;
+    border-radius:50%;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#frameDoc{
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* 🔥 CONTENIDO HORARIOS checarr */
+.horizontal-layout{
+display:flex;
+gap:25px;
+flex-wrap:wrap;
+justify-content:center;
+width:100%;
+}
+
+/* 🔥 TABLA HORARIOS */
+.horarios-container{
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.10);
+
+width:80%;
+max-width:1200px;
+
+margin:0 auto 40px auto;
+
+overflow-x:auto;
+}
+
+.tabla-horarios{
+width:100%;
+border-collapse:collapse;
+}
+
+.tabla-horarios th{
+background:#2e7d32;
+color:white;
+padding:14px;
+text-align:center;
+}
+
+.tabla-horarios td{
+background:white;
+padding:14px;
+text-align:center;
+border:1px solid #e5e5e5;
+}
+
+
+.horizontal-layout{
+width:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+@media (max-width:768px){
+
+.horarios-container{
+    width:90%;
+    padding:10px;
+    overflow-x:auto;
+}
+
+.tabla-horarios{
+    min-width:400px;
+}
+
+.tabla-horarios th,
+.tabla-horarios td{
+    padding:8px;
+    font-size:12px;
+}
+
+}
+
+@media (max-width: 768px){
+
+.tabla-horarios td div{
+width:80%;
+max-width:140px;
+margin:auto;
+padding:10px;
+}
+
+}
+
+
+
+/* 🔥 FORM AGREGAR CLASE */
+.form-container{
+background:transparent;
+padding:0;
+border-radius:0;
+box-shadow:none;
+width:100%;
+max-width:900px;
+margin:auto;
+}
+.campo{
+display:flex;
+flex-direction:column;
+gap:6px;
+}
+
+.campo label{
+font-weight:bold;
+color:#333;
+}
+
+.campo input,
+.campo select{
+padding:10px;
+border-radius:10px;
+border:1px solid #ccc;
+font-size:16px;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li.active a{
+    background:#149b1d;
+    color:white;
+}
+
+/* BOTONES del perfilll bueno */
+.botones{
+    grid-column:span 2;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.btn-guardar{
+    background:#149b1d;
+    color:white;
+    border:none;
+    padding:10px 25px;
+     font-size:16px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.btn-guardar:hover{
+    background:#149b1d;
+}
+
+.btn-cancelar{
+    background:#149b1d;
+    color:white;
+    border:none;
+    padding:10px 25px;
+     font-size:16px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
+.btn-cancelar:hover{
+     background:#149b1d;
+}
+
+/* DATOS DEL PERFIL Y EL ADMINISTRADOR EL BUENOOOO*/
+.datos{
+    width:100%;
+    background:#f8fafc;
+    padding:25px;
+    border-radius:15px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.datos p{
+    padding:12px;
+    background:white;
+    border-radius:10px;
+}
+
+/* 🔥 MENÚ del docente y administrador*/
+.menu-usuario{
+display:none;
+position:absolute;
+top:65px;
+right:30px;
+background:white;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+padding:10px;
+}
+
+.menu-usuario a{
+display:block;
+padding:10px;
+color:#333;
+text-decoration:none;
+border-radius:8px;
+}
+
+.menu-usuario a:hover{
+background:#149b1d;
+color:white;
+}
+
+/* 🔔 NOTIFICACIONES */
+.panel-notificaciones{
+display:none;
+position:absolute;
+top:65px;
+right:120px;
+background:white;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+padding:10px;
+}
+
+
+/* 🔥 FORM */
+.form-planeacion{
+    width:90%;
+    max-width:900px;
+    margin:auto;
+
+    background:transparent;
+
+    padding:20px;
+
+    border-radius:0;
+
+    box-shadow:none;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.campo-full{
+grid-column:1/3;
+}
+
+.campo input,
+.campo textarea{
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+.botones-formulario{
+grid-column:1/3;
+display:flex;
+justify-content:center;
+gap:15px;
+}
+
+.btn-principal{
+background:#149b1d;
+color:white;
+padding:12px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+
+/* 🔥 PANEL ARRIBA DERECHA ADMINISTRADOR EL BUENOOO*/
+.user-panel{
+position:absolute;
+right:50px;
+top:15px;
+
+display:flex;
+align-items:center;
+gap:30px;
+
+z-index:999;
+}
+
+.user-icon{
+width:50px;
+height:50px;
+
+border-radius:50%;
+object-fit:cover;
+
+cursor:pointer;
+
+
+}
+
+.user-icon:hover{
+transform:scale(1.1);
+box-shadow:0 0 12px rgba(76,175,80,0.5);
+}
+
+.arrow{
+font-size:18px;
+}
+
+.notification{
+position:relative;
+
+font-size:24px;
+
+cursor:pointer;
+}
+
+.badge{
+position:absolute;
+top:-5px;
+right:-5px;
+
+width:18px;
+height:18px;
+
+background:red;
+color:white;
+
+border-radius:50%;
+
+font-size:20px;
+font-weight:bold;
+
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* 🔥 SIDEBAR GENERAL DE ADMINISTRADOR */
+.sidebar{
+width:280px;
+background:#f5f5f5;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+padding:9px 15px;
+display:flex;
+flex-direction:column;
+align-items:center;
+font-weight:bold;
+}
+
+/* 🔥 LOGO ADMINISTRADOR*/
+.logo-panel{
+text-align:center;
+margin-bottom:20px;
+
+}
+
+.logo-panel img{
+width:70px;
+margin-bottom:1px;
+}
+
+.logo-panel h3{
+font-size:15px;
+font-weight:bold;
+line-height:1;
+color:#333;
+}
+
+
+/* BOTONES ADMINISTRADOR DEL DASHBOARD buenooo*/
+.sidebar ul li a{
+display:flex;
+align-items:center;
+gap:10px;
+padding:7px 10px;
+border-radius:12px;
+text-decoration:none;
+font-size:15px;
+font-weight:500;
+color:#030303;
+transition:0.3s;
+}
+
+
+.sidebar ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+    width:100%;
+}
+
+.sidebar li{
+    list-style:none;
+}
+
+
+/* FOTO DEL ADMINISTRADOR DEL DASHBOARD buenoooo*/
+.admin-info img{
+width:55px;
+height:55px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:5px;
+border:2px solid #fff;
+}
+
+
+/* 🔥 OPCIONAL: fondo ligero para que resalte LO DEL ADMINISTRADOR */
+/* 🔥 TARJETA DEL ADMINISTRADOR */
+
+.admin-info{
+background:#f8f9fb;
+border-radius:12px;
+margin:10px;
+width:220px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.admin-info-box{
+display:flex;
+flex-direction:column;
+align-items:center;
+text-align:center;
+padding:15px;
+width:100%;
+}
+
+/* FOTO */
+.admin-info-box img{
+width:80px;
+height:80px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+/* NOMBRE */
+#nombreAdmin{
+margin:0;
+font-size:16px;
+font-weight:bold;
+line-height:1.3;
+text-align:center;
+}
+
+/* ROL */
+#rolAdmin{
+margin-top:8px;
+font-size:14px;
+color:#555;
+text-align:center;
+}
+
+/* BOTÓN MENÚ (ABAJO) PERFIL DOCENTE BUENOOOO */
+.btn-menu{
+position:fixed;
+bottom:20px;
+right:20px;
+
+background:#149b1d;
+color:white !important;
+
+padding:14px 25px;
+
+border-radius:50px;
+
+text-decoration:none !important;
+
+font-size:16px;
+font-weight:bold;
+
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+
+box-shadow:0 6px 15px rgba(0,0,0,.25);
+
+z-index:9999;
+
+transition:.3s;
+}
+
+.btn-menu:hover{
+background:#149b1d;
+color:white !important;
+text-decoration:none !important;
+
+transform:translateY(-3px);
+}
+
+.btn-menu:visited,
+.btn-menu:link,
+.btn-menu:active{
+color:white !important;
+text-decoration:none !important;
+}
+
+/* BOTÓN EDITAR (ARRIBA DEL MENÚ) DE PERFIL DOCENTE BUENOOOOO */
+.btn-editar{
+position: fixed;
+bottom: 20px;
+right: 20px;
+background:#149b1d;
+color: white;
+border: none;
+padding: 12px 18px;
+border-radius: 30px;
+cursor: pointer;
+box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+z-index: 9999;
+
+margin-bottom: 80px;
+}
+
+/* 🔥 FOTO dell docente buenoooo */
+.user-img{
+width:50px;
+height:50px;
+border-radius:50%;
+object-fit:cover;
+cursor:pointer;
+display:block;
+}
+
+/* 🔴 NUMERO */
+.badge{
+position:absolute;
+top:-5px;
+right:-8px;
+background:red;
+color:white;
+font-size:10px;
+padding:2px 5px;
+border-radius:50%;
+}
+
+
+/* 🔥 IMAGEN del docente buenoooo */
+.card img{
+width:100px;
+height:100px;
+object-fit:contain;
+margin-bottom:15px;
+}
+
+/* 🔥 TEXTO docente buenooo */
+.card p{
+font-size:22px;
+font-weight:bold;
+color:#222;
+margin-top:10px;
+}
+
+/* CELDAS Ver planeacion docente buenooo*/
+.tabla{
+width:90%;
+border-collapse:collapse;
+background:#fff;
+border-radius:15px;
+overflow:hidden;
+}
+
+
+.tabla-docentes{
+    width: 75%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.tabla-docentes th,
+.tabla-docentes td{
+    padding: 18px;
+    text-align: center;
+}
+
+.tabla-docentes th:nth-child(1),
+.tabla-docentes td:nth-child(1){
+    width: 40%;
+}
+
+.tabla-docentes th:nth-child(2),
+.tabla-docentes td:nth-child(2){
+    width: 30%;
+}
+
+
+/* 🔥 BOTONES FLOTANTES  DE PERFIL ADMINISTRADOR BUENOOOO*/
+.botones-flotantes{
+position:fixed;
+right:25px;
+bottom:25px;
+display:flex;
+flex-direction:column;
+gap:15px;
+z-index:1000;
+}
+
+.tabla thead{
+background:#17a317;
+color:white;
+}
+
+.tabla td{
+padding:18px;
+text-align:center;
+border-bottom:1px solid #eaeaea;
+}
+
+.tabla tbody tr:hover{
+background:#f7fff7;
+}
+
+
+.tabla button{
+padding:10px 15px;
+border-radius:10px;
+font-size:14px;
+}
+
+/* 🔥 BOTONES ADMISRADOR buenoooo */
+.btn-flotante{
+background:#149b1d;
+color:white;
+padding:15px 24px;
+border-radius:40px;
+text-decoration:none;
+font-size:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+box-shadow:0 8px 20px rgba(0,0,0,0.25);
+transition:0.3s;
+}
+
+/* EDITAR PERFIL ADMIN EL BUENOOOOOOO */
+.editar-perfil{
+
+width: 500px;
+
+margin: 30px auto;
+
+background: white;
+
+padding: 40px;
+
+border-radius: 35px;
+
+box-shadow:
+0 12px 30px rgba(0,0,0,0.08);
+
+text-align: center;
+
+}
+
+/* 🔥 IMAGEN */
+.foto-editar img{
+
+width: 140px;
+height: 140px;
+
+border-radius: 50%;
+
+object-fit: cover;
+
+border: 5px solid #149b1d;
+
+box-shadow:
+0 5px 15px rgba(0,0,0,0.15);
+
+margin-bottom: 20px;
+
+}
+
+/* 🔥 INPUTS DEL ADMINISTRADOR BUENOOOOOOOOOO */
+.editar-perfil input,
+.editar-perfil select{
+
+padding: 20px;
+
+border-radius: 15px;
+
+border: 2px solid #ddd;
+
+font-size: 15px;
+
+outline: none;
+
+transition: 0.3s;
+
+background: #fafafa;
+
+margin-top: 20px;
+}
+
+/* 🔥 BOTON GUARDAR ADMMINISTRADOR BUENOOOO*/
+.editar-perfil button[type="submit"]{
+
+background: #149b1d;
+
+color: white;
+
+border: none;
+
+padding: 16px;
+
+border-radius: 18px;
+
+font-size: 16px;
+
+font-weight: bold;
+
+cursor: pointer;
+
+transition: 0.3s;
+
+margin-top: 20px;
+
+}
+
+/* PERFIL DOCENTE BUENOOOO*/
+
+.perfil-card{
+
+width: 580px;
+
+margin: 40px auto;
+
+background: white;
+
+border-radius: 35px;
+
+padding: 50px;
+
+box-shadow:
+0 20px 30px rgba(0,0,0,0.08);
+
+transition: 0.3s;
+
+}
+
+/* 🔥 INFO */
+.perfil-info{
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+text-align: center;
+
+}
+
+/* 🔥 IMAGEN BUENOOOO*/
+.img-perfil{
+
+width: 150px;
+height: 150px;
+
+border-radius: 50%;
+
+object-fit: cover;
+
+border: 6px solid #149b1d;
+
+box-shadow:
+0 8px 20px rgba(0,0,0,0.15);
+
+}
+
+.btn-editar{
+background:#149b1d;
+}
+
+.btn-eliminar{
+background:#b71c1c;
+}
+
+/* LO DEL HEADER DE DOCENTE BUENOOOOOOOOOOOOOOOOOOOO*/
+.titulo{
+    text-align:center;
+
+    font-size:50px;
+
+    font-weight:900;
+
+    color:#111;
+
+    line-height:1.1;
+
+    margin-top:35px;
+    margin-bottom:30px;
+
+    width:70%;
+}
+
+.right-icons{
+position:absolute;
+right:20px;
+top:10px;
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+/* LO De los botones flotantes de perfil DE DOCENTE BUENOOOOOOOOOOOOOOOOOOOO*/
+.btn-editar,
+.btn-menu{
+width:auto !important;
+padding:12px 20px;
+white-space:nowrap;
+}
+
+/* TARJETAS del admin buenooo */
+.cards{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+align-items:center;
+gap:30px;
+
+max-width:1200px;
+margin:50px auto;
+}
+.card{
+    width:260px;
+    height:250px;
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:20px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    border-top:6px solid #149b1d;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.10);
+
+    transition:.3s;
+
+    cursor:pointer;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.contenido{
+    margin-left:280px;
+    width:calc(100% - 280px);
+
+
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+       text-align:center;
+}
+
+/* ================================= */
+/* RESPONSIVE DASHBOARD */
+/* ================================= */
+
+@media (max-width:1200px){
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .titulo{
+        font-size:34px;
+    }
+
+}
+
+@media (max-width:900px){
+
+    .sidebar{
+        width:220px;
+    }
+
+    .contenido{
+        margin-left:220px;
+        width:calc(100% - 220px);
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .titulo{
+        font-size:28px;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .sidebar{
+        position:fixed;
+        left:-100%;
+        top:0;
+        width:280px;
+        height:100vh;
+        z-index:9999;
+        transition:.3s;
+    }
+
+    .sidebar.activo{
+        left:0;
+    }
+
+    .contenido{
+        margin-left:0 !important;
+        width:100% !important;
+        max-width:100% !important;
+
+        padding:20px;
+
+        position:relative;
+        left:0;
+    }
+
+    body{
+        overflow-x:hidden;
+    }
+
+}
+
+
+@media (max-width:768px){
+
+    .tabla-box,
+    .horarios-container{
+        overflow-x:auto;
+    }
+
+    .tabla,
+    .tabla-horarios{
+        min-width:700px;
+    }
+
+}
+
+
+.filtros{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto 40px auto;
+
+
+      margin-top: 30px;
+    margin-bottom: 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+}
+
+.filtros h3{
+    font-size:32px;
+    margin-bottom:25px;
+    color:#222;
+}
+
+.filtros input{
+    width:100%;
+    max-width:600px;
+
+    padding:15px 20px;
+
+    border:2px solid #ddd;
+    border-radius:15px;
+
+    font-size:18px;
+
+    text-align:center;
+
+    outline:none;
+}
+
+.filtros input:focus{
+    border-color:#149b1d;
+    box-shadow:0 0 10px rgba(76,175,80,.25);
+}
+
+.menu-toggle{
+display:none;
+
+position:fixed;
+
+top:8px;
+left:8px;
+
+width:38px;
+height:38px;
+
+padding:0;
+
+background:#149b1d;
+color:white;
+
+border:none;
+border-radius:8px;
+
+font-size:18px;
+
+cursor:pointer;
+
+z-index:10000;
+
+box-shadow:0 3px 8px rgba(0,0,0,.20);
+
+transition:.3s;
+}
+
+@media (max-width:768px){
+
+.menu-toggle{
+display:flex !important;
+justify-content:center;
+align-items:center;
+}
+
+}
+
+.menu-toggle-docente{
+display:none;
+}
+
+.sidebar-docente{
+width:280px;
+}
+
+@media(max-width:768px){
+
+.menu-toggle-docente{
+display:flex;
+position:fixed;
+top:10px;
+left:10px;
+z-index:9999;
+}
+
+.sidebar-docente{
+position:fixed;
+left:-280px;
+top:0;
+width:280px;
+height:100vh;
+transition:.3s;
+}
+
+.sidebar-docente.activo{
+left:0;
+}
+
+}
+
+
+
+/* 🔥 QUITAR MORADO, ROJO Y SUBRAYADO DE LAS TARJETAS */
+
+.cards a,
+.card a{
+    text-decoration:none !important;
+    color:#222 !important;
+}
+
+.cards a:visited,
+.card a:visited{
+    color:#222 !important;
+}
+
+.cards a:hover,
+.card a:hover{
+    color:#149b1d !important;
+    text-decoration:none !important;
+}
+
+/* TEXTO DE LAS TARJETAS */
+.card p{
+    color:#222 !important;
+    text-decoration:none !important;
+    font-weight:bold;
+}
+
+
+.admin-info-box{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.admin-info-box img{
+    margin-bottom: 15px;
+}
+
+.admin-info-box p{
+    margin-top: 10px;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.admin-info-box span{
+    margin-top: 5px;
+    display: block;
+}
+.sidebar ul{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+
+
+.menu-docente li{
+    margin-bottom: 10px;
+}
+
+/* TEXTO DEL PERFIL DOCENTE  */
+
+.titulo-dato{
+    font-weight: 900;
+    font-size: 19px;
+    color: #000;
+}
+
+.datos p{
+    font-size: 17px;
+    margin: 15px 0;
+        color: #000;
+}
+
+
+label{
+    font-size: 20px;
+    font-weight: 900;
+    color: #000;
+    display: block;
+    margin-bottom: 15px;
+}
+
+
+.btn-secundario{
+background:#149b1d;
+color:white;
+padding:15px 15px;
+border-radius:10px;
+text-decoration:none;
+font-weight:bold;
+
+display:inline-block;
+
+width:auto !important;
+min-width:115px;
+
+text-align:center;
+
+transition:.3s;
+}
+
+.btn-secundario:hover{
+transform:translateY(-2px);
+background:#149b1d;
+}
+
+
+/* CONTENEDOR DE TARJETAS */
+.cards{
+    width:100%;
+    max-width:1200px;
+    margin:40px auto;
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+}
+
+/* TARJETAS */
+.card{
+    width:260px;
+    height:260px;
+
+    background:white;
+
+    border-radius:25px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.10);
+
+    transition:.3s;
+}
+
+/* EFECTO */
+.card:hover{
+    transform:translateY(-5px);
+}
+
+
+.user-img{
+position: relative;
+z-index: 9999;
+cursor: pointer;
+}
+
+.right-icons{
+position: absolute;
+right: 40px;
+top: 15px;
+z-index: 9999;
+}
+
+.menu-usuario{
+z-index: 10000;
+}
+
+
+.buscador{
+    text-align:center;
+    margin-bottom:50px;
+}
+
+#busqueda{
+    width:300px;
+    max-width:80%;
+    padding:12px 18px;
+    border:none;
+    border-radius:30px;
+    background:#f5f5f5;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    font-size:15px;
+    outline:none;
+}
+
+
+.periodo-box{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:15px;
+
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.periodo-box label{
+margin:0;
+font-size:18px;
+font-weight:bold;
+}
+
+.periodo-box input{
+width:300px;
+margin:0;
+}
+
+.periodo-box .btn-principal{
+margin:0;
+}
+
+
+
+/* ===================================== */
+/* FORMULARIO AGREGAR CLASE */
+/* ===================================== */
+
+.form-container{
+
+width:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+.form-planeacion{
+
+background:#fff;
+
+width:90%;
+max-width:800px;
+
+padding:35px;
+
+border-radius:25px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.10);
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:20px;
+
+margin:auto;
+
+}
+
+.form-planeacion input,
+.form-planeacion select{
+
+height:48px;
+
+padding:0 12px;
+
+font-size:15px;
+
+border-radius:12px;
+
+}
+
+.btn-guardar{
+
+width:200px;
+
+height:50px;
+
+font-size:16px;
+
+margin:auto;
+
+display:block;
+
+}
+
+/* CAMPOS COMPLETOS */
+.campo-full{
+grid-column:1 / 3;
+}
+
+/* LABELS */
+.form-planeacion label{
+
+font-size:18px;
+
+font-weight:700;
+
+color:#333;
+
+margin-bottom:8px;
+
+display:block;
+
+}
+
+/* INPUTS */
+.form-planeacion input,
+.form-planeacion select{
+
+width:100%;
+
+height:55px;
+
+padding:0 15px;
+
+border:2px solid #e5e5e5;
+
+border-radius:15px;
+
+font-size:16px;
+
+box-sizing:border-box;
+
+transition:.3s;
+
+background:white;
+
+}
+
+/* EFECTO AL DAR CLICK */
+.form-planeacion input:focus,
+.form-planeacion select:focus{
+
+outline:none;
+
+border-color:#149b1d;
+
+box-shadow:0 0 10px rgba(20,155,29,.20);
+
+}
+
+/* BOTÓN */
+.btn-guardar{
+
+background:#149b1d;
+
+color:white;
+
+border:none;
+
+padding:15px 30px;
+
+border-radius:15px;
+
+font-size:18px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+width:250px;
+
+margin:auto;
+
+display:block;
+
+transition:.3s;
+
+}
+
+.btn-guardar:hover{
+
+transform:translateY(-3px);
+
+box-shadow:0 6px 15px rgba(0,0,0,.15);
+
+}
+
+/* RESPONSIVO */
+@media(max-width:768px){
+
+.form-planeacion{
+
+grid-template-columns:1fr;
+
+padding:25px;
+
+}
+
+.campo-full{
+
+grid-column:auto;
+
+}
+
+.btn-guardar{
+
+width:100%;
+
+}
+
+}
+
+
+
+/* CREAR PLANEACION */
+
+.form-planeacion{
+
+background:white;
+
+width:90%;
+max-width:800px;
+
+padding:35px;
+
+border-radius:25px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.10);
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:20px;
+
+margin:auto;
+
+}
+
+.form-planeacion input{
+
+height:48px;
+
+padding:0 12px;
+
+font-size:15px;
+
+border:1px solid #ddd;
+
+border-radius:12px;
+
+}
+
+.form-planeacion input:focus{
+
+outline:none;
+
+border-color:#149b1d;
+
+box-shadow:0 0 10px rgba(20,155,29,.15);
+
+}
+
+.btn-archivo{
+
+background:#149b1d;
+
+color:white;
+
+border:none;
+
+padding:12px 15px;
+
+border-radius:12px;
+
+font-size:15px;
+
+cursor:pointer;
+
+width:100%;
+
+}
+
+.btn-guardar{
+
+background:#149b1d;
+
+color:white;
+
+border:none;
+
+width:215px;
+
+height:60px;
+
+border-radius:12px;
+
+font-size:16px;
+
+font-weight:bold;
+
+display:block;
+
+margin:auto;
+
+}
+
+.campo-full{
+grid-column:1 / 3;
+}
+
+#nombreArchivo{
+
+margin-top:10px;
+
+font-size:13px;
+
+color:#555;
+
+word-break:break-word;
+
+}
+#nombreArchivo{
+margin-top:8px;
+font-size:14px;
+color:#555;
+word-break:break-word;
+}
+
+
+.cargo-docente{
+    color:#666;
+    font-size:18px;
+    margin-top:8px;
+}
+
+#nombreCompletoPerfil{
+    margin-top:15px;
+    font-size:28px;
+    font-weight:700;
+    color:#222;
+    text-align:center;
+}
+
+
+
+
+
+/* ===== PERFIL MODERNO ===== */
+
+.perfil-moderno{
+    max-width: 900px;
+    margin: auto;
+    padding: 40px;
+    border-radius: 25px;
+    background: #f8f9fa;
+    box-shadow: 0 10px 30px rgba(0,0,0,.10);
+}
+
+.perfil-info{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.img-perfil{
+    width:220px;
+    height:220px;
+    object-fit:cover;
+    border-radius:50%;
+    border:6px solid #16a31a;
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+}
+
+#nombreCompletoPerfil{
+    margin-top:15px;
+    font-size:32px;
+    font-weight:700;
+    color:#222;
+    text-align:center;
+}
+
+.cargo-docente{
+    font-size:18px;
+    color:#666;
+    margin-top:5px;
+    margin-bottom:30px;
+}
+
+.datos{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.datos p{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+    text-align:center;
+    font-size:18px;
+}
+
+.titulo-dato{
+    display:block;
+    font-size:20px;
+    font-weight:bold;
+    color:#090909;
+    margin-bottom:10px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+.datos{
+    grid-template-columns:1fr;
+}
+
+.img-perfil{
+    width:180px;
+    height:180px;
+}
+
+#nombreCompletoPerfil{
+    font-size:26px;
+}
+
+}
+
+
+
+/* EDITAR PERFIL */
+
+.form-perfil{
+max-width:900px;
+margin:auto;
+}
+
+.foto-perfil-editar{
+grid-column:1/3;
+
+display:flex;
+flex-direction:column;
+align-items:center;
+
+margin-bottom:20px;
+}
+
+.foto-perfil-editar img{
+width:180px;
+height:180px;
+border-radius:50%;
+object-fit:cover;
+
+border:6px solid #149b1d;
+
+box-shadow:0 5px 20px rgba(0,0,0,.15);
+
+margin-bottom:20px;
+}
+
+@media(max-width:768px){
+
+.foto-perfil-editar{
+grid-column:1;
+}
+
+}
+
+/* ===== EDITAR PERFIL MODERNO ===== */
+
+.editar-perfil.moderno{
+
+max-width:720px;
+margin:auto;
+
+background:#fff;
+
+padding:40px;
+
+border-radius:25px;
+
+box-shadow:0 10px 30px rgba(0,0,0,.10);
+
+}
+
+.foto-editar{
+
+text-align:center;
+
+margin-bottom:25px;
+
+}
+
+.img-perfil-editar{
+
+width:180px;
+height:180px;
+
+object-fit:cover;
+
+border-radius:50%;
+
+border:6px solid #149b1d;
+
+box-shadow:0 5px 20px rgba(0,0,0,.15);
+
+}
+
+#nombreVista{
+
+margin-top:15px;
+
+font-size:28px;
+
+color:#222;
+
+}
+
+.cargo-editar{
+
+color:#666;
+
+font-size:18px;
+
+margin-bottom:10px;
+
+}
+
+.btn-foto{
+
+background:#149b1d;
+
+color:white;
+
+border:none;
+
+padding:12px 25px;
+
+border-radius:12px;
+
+cursor:pointer;
+
+font-size:15px;
+
+}
+
+.acciones-editar{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:20px;
+margin-top:30px;
+}
+
+.btn-guardar,
+.btn-regresar{
+
+width:180px;
+height:55px;
+
+margin:0;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+border:none;
+border-radius:12px;
+
+background:#16a316;
+color:white;
+
+font-size:18px;
+font-weight:bold;
+
+cursor:pointer;
+
+text-decoration:none;
+}
+
+.acciones-editar{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:20px;
+margin-top:30px;
+}
+
+.btn-guardar,
+.btn-regresar{
+
+width:180px;
+height:55px;
+
+margin:0;
+margin-top:15px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+border:none;
+border-radius:12px;
+
+background:#16a316;
+color:white;
+
+font-size:18px;
+font-weight:bold;
+
+cursor:pointer;
+
+text-decoration:none;
+}
+
+.btn-guardar:hover,
+.btn-regresar:hover{
+transform:translateY(-2px);
+}
+
+
+.form-editar label{
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+
+.stats-container{
+display:flex;
+justify-content:center;
+gap:20px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+
+.planeaciones-container{
+width:100%;
+max-width:1300px;
+margin:0 auto;
+}
+
+#buscar{
+width:500px;
+max-width:80%;
+
+padding:14px 20px;
+
+border:1px solid #dcdcdc;
+border-radius:15px;
+
+font-size:16px;
+
+outline:none;
+
+transition:.3s;
+}
+
+#buscar:focus{
+border-color:#18a318;
+box-shadow:0 0 10px rgba(24,163,24,.2);
+}
+
+
+.tabla th:last-child,
+.tabla td:last-child{
+width:120px;
+}
+
+.tabla td{
+padding:25px 15px;
+}
+
+.barra-superior{
+display:flex;
+justify-content:center;
+margin-bottom:20px;
+}
+
+
+#buscar{
+width:650px;
+max-width:90%;
+
+padding:14px 20px;
+
+border:1px solid #dcdcdc;
+border-radius:15px;
+
+font-size:16px;
+
+outline:none;
+}
+
+
+#buscarPlaneacion{
+    margin-top: 35px; /* Baja la barra */
+}

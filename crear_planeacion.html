@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Crear Planeación</title>
+<link rel="stylesheet" href="style.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+<body class="panel-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoDocenteSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreDocenteSidebar">
+Docente
+</p>
+
+<span id="rolDocenteSidebar">
+Docente
+</span>
+
+</div>
+</div>
+
+<ul>
+<li><a href="dashboard.html">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html" class="active">✏️ Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">Crear Planeación</h1>
+
+<!-- FORM -->
+<div class="form-container">
+
+<form class="form-planeacion" id="formPlaneacion" enctype="multipart/form-data">
+
+<div class="campo">
+<label>Periodo</label>
+<input type="text" name="periodo" id="periodo">
+</div>
+
+<div class="campo">
+<label>Carrera</label>
+<input type="text" name="carrera" id="carrera">
+</div>
+
+<div class="campo">
+<label>Grupo</label>
+<input type="text" name="grupo" id="grupo">
+</div>
+
+<div class="campo">
+<label>Materia</label>
+<input type="text" name="materia" id="materia">
+</div>
+
+<div class="campo">
+<label>Fecha</label>
+<input type="date" name="fecha" id="fecha">
+</div>
+
+<div class="campo">
+<label>Archivo</label>
+
+<button
+type="button"
+class="btn-archivo"
+onclick="seleccionarArchivo()">
+📄 Seleccionar
+</button>
+
+<input type="file"
+name="archivo"
+id="archivo"
+style="display:none">
+
+<p id="nombreArchivo"></p>
+
+</div>
+
+
+<div class="campo campo-full">
+
+<button type="submit" class="btn-guardar">
+💾 Guardar Planeación
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔥 USUARIO
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario || usuario.tipo !== "docente"){
+alert("Acceso solo docentes");
+window.location = "login.html";
+}
+
+// 🔥 ARCHIVO
+function seleccionarArchivo(){
+document.getElementById("archivo").click();
+}
+
+document.getElementById("archivo").addEventListener("change", function(){
+if(this.files[0]){
+document.getElementById("nombreArchivo").innerText = "📄 " + this.files[0].name;
+}
+});
+
+// 🔥 GUARDAR
+document.getElementById("formPlaneacion").addEventListener("submit", function(e){
+e.preventDefault();
+
+const formData = new FormData(this);
+formData.append("id_usuario", usuario.id);
+
+console.log(usuario);
+console.log("ID:", usuario.id);
+
+fetch("http://localhost:3000/guardar-planeacion", {
+method:"POST",
+body:formData
+})
+.then(res=>res.text())
+.then(data=>{
+if(data==="ok"){
+alert("✅ Guardado correctamente");
+this.reset();
+document.getElementById("nombreArchivo").innerText="";
+window.history.back();
+}else{
+alert("❌ Error");
+}
+});
+});
+
+const datosPerfil =
+JSON.parse(localStorage.getItem("perfil_" + usuario.id));
+
+if(datosPerfil){
+
+document.getElementById("nombreDocenteSidebar").innerText =
+datosPerfil.nombre || "Docente";
+
+}
+
+const fotoGuardada =
+localStorage.getItem("fotoPerfil_" + usuario.id);
+
+if(
+fotoGuardada &&
+fotoGuardada !== "null" &&
+fotoGuardada !== "undefined"
+){
+
+document.getElementById("fotoDocenteSidebar").src =
+fotoGuardada;
+
+}
+
+</script>
+<a href="dashboard.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>

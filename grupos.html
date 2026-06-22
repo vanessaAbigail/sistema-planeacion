@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Grupos / Asignaturas</title>
+
+<link rel="stylesheet" href="style.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body class="panel-body">
+
+<!-- 🔒 SOLO ADMIN -->
+<script>
+
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario || usuario.tipo !== "administrador"){
+
+alert("⚠️ Acceso solo administrador");
+
+window.location = "login.html";
+
+}
+
+</script>
+
+<!-- 🔥 SIDEBAR ADMIN -->
+<div class="sidebar">
+
+<div class="logo-panel">
+
+<img src="img/logo.jpg">
+
+<h3>
+SISTEMA DE PLANEACIÓN<br>
+ACADÉMICA
+</h3>
+
+</div>
+
+<!-- 🔥 INFO ADMIN -->
+<div class="admin-info">
+
+<div class="admin-info-box">
+
+<img id="fotoAdminSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreAdmin">
+Administrador
+</p>
+
+<span id="rolAdmin">
+Administrador
+</span>
+
+</div>
+
+</div>
+
+<ul>
+
+<li>
+<a href="dashboard_admin.html">
+🏠 Menú
+</a>
+</li>
+
+<li>
+<a href="planeaciones_admin.html">
+📋 Planeaciones
+</a>
+</li>
+
+<li>
+<a href="docentes.html">
+👨‍🏫 Docentes
+</a>
+</li>
+
+<li>
+<a href="horarios_admin.html">
+⏰ Horarios
+</a>
+</li>
+
+<li class="active">
+<a href="grupos.html">
+👥 Grupos / Asignaturas
+</a>
+</li>
+
+<li>
+<a href="perfil_admin.html">
+👤 Mi Perfil
+</a>
+</li>
+
+<li>
+<a href="#" onclick="cerrarSesion()">
+🚪 Cerrar Sesión
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<!-- 🔥 CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">
+Grupos / Asignaturas
+</h1>
+
+
+
+<div class="contenedor">
+
+<!-- 🔥 BARRA SUPERIOR -->
+<div class="filtro-box">
+
+<!-- 🔍 BUSCADOR -->
+<div class="busqueda-box">
+
+<input
+type="text"
+id="buscador"
+placeholder="🔍 Buscar materia, docente o grupo..."
+onkeyup="mostrar()"
+>
+
+</div>
+
+<!-- 🔥 CONTADOR -->
+<div class="contador-box">
+
+<span id="totalCards">
+0
+</span>
+
+Grupos
+
+</div>
+
+</div>
+
+<!-- 🔥 CARDS -->
+<div class="cards" id="lista">
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔥 ADMIN ID
+const adminId = "admin";
+
+// 🔥 CARGAR DATOS ADMIN
+
+window.onload = function(){
+
+// 🔥 NOMBRE
+const datos =
+JSON.parse(
+localStorage.getItem(
+"perfil_admin_" + adminId
+)
+);
+
+if(datos){
+
+document.getElementById("nombreAdmin").innerText =
+datos.nombre || "Administrador";
+
+}
+
+// 🔥 FOTO
+const foto =
+localStorage.getItem(
+"foto_admin_" + adminId
+);
+
+if(foto){
+
+document.getElementById(
+"fotoAdminSidebar"
+).src = foto;
+
+}
+
+// 🔥 MOSTRAR CARDS
+mostrar();
+
+}
+
+// 🔥 CERRAR SESIÓN
+function cerrarSesion(){
+
+localStorage.removeItem("usuario");
+
+window.location = "login.html";
+
+}
+
+// 🔥 MOSTRAR GRUPOS AUTOMÁTICOS
+
+function mostrar(){
+
+let lista =
+document.getElementById("lista");
+
+let texto =
+document.getElementById("buscador")
+.value
+.toLowerCase();
+
+fetch("http://localhost:3000/grupos")
+
+.then(res => res.json())
+
+.then(datos => {
+
+lista.innerHTML = "";
+
+// 🔥 BUSCADOR
+let filtrados = datos.filter(d =>
+
+d.materia.toLowerCase().includes(texto)
+
+||
+
+d.docente.toLowerCase().includes(texto)
+
+||
+
+d.grupo.toLowerCase().includes(texto)
+
+);
+
+// 🔥 CONTADOR
+document.getElementById("totalCards")
+.innerText = filtrados.length;
+
+// 🔥 MOSTRAR CARDS
+filtrados.forEach(d => {
+
+lista.innerHTML += `
+
+<div class="card">
+
+<div class="icono">
+📚
+</div>
+
+<h3>
+${d.grupo}
+</h3>
+
+<p>
+<b>Materia:</b>
+${d.materia}
+</p>
+
+<p>
+<b>Docente:</b>
+${d.docente}
+</p>
+
+<p>
+<b>Carrera:</b>
+${d.carrera}
+</p>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+</script>
+<a href="dashboard_admin.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+
+</html>

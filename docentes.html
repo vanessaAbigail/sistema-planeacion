@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Docentes - Admin</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body class="panel-body">
+
+<!-- 🔒 SOLO ADMIN -->
+
+<script>
+
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario || usuario.tipo !== "administrador"){
+
+alert("⚠️ Acceso solo administrador");
+
+window.location = "login.html";
+
+}
+
+</script>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<div class="logo-panel">
+
+<img src="img/logo.jpg">
+
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+
+</div>
+
+<div class="admin-info">
+
+<div class="admin-info-box">
+
+<img id="fotoAdminSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreAdmin">
+Administrador
+</p>
+
+<span id="rolAdmin">
+Administrador
+</span>
+
+</div>
+
+</div>
+
+<ul>
+
+<li>
+<a href="dashboard_admin.html">
+🏠 Menú
+</a>
+</li>
+
+<li>
+<a href="planeaciones_admin.html">
+📋 Planeaciones
+</a>
+</li>
+
+<li class="active">
+<a href="#">
+👨‍🏫 Docentes
+</a>
+</li>
+
+<li>
+<a href="horarios_admin.html">
+⏰ Horarios
+</a>
+</li>
+
+<li>
+<a href="grupos.html">
+👥 Grupos
+</a>
+</li>
+
+<li>
+<a href="perfil_admin.html">
+👤 Mi Perfil
+</a>
+</li>
+
+<li>
+<a href="#" onclick="cerrarSesion()">
+🚪 Cerrar Sesión
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+
+<div class="contenido">
+
+<h1 class="titulo">
+DOCENTES
+</h1>
+
+<input
+type="text"
+id="buscador"
+placeholder="🔍 Buscar docente..."
+onkeyup="filtrar()"
+>
+
+<table class="tabla">
+
+<thead>
+
+<tr>
+<th>Nombre</th>
+<th>Carrera</th>
+</tr>
+
+</thead>
+
+<tbody id="lista"></tbody>
+
+</table>
+
+</div>
+
+<script>
+
+// VALIDAR ADMIN
+
+const adminUser =
+JSON.parse(localStorage.getItem("usuario"));
+
+if(!adminUser || adminUser.tipo !== "administrador"){
+
+alert("⚠️ Acceso solo administrador");
+
+window.location = "login.html";
+
+}
+
+// ID ADMIN
+
+const adminId = "admin";
+
+// INICIAR
+
+function iniciarPagina(){
+
+// DATOS ADMIN
+
+const datos =
+JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+if(datos){
+
+document.getElementById("nombreAdmin").innerText =
+datos.nombre || "Administrador";
+
+document.getElementById("rolAdmin").innerText =
+"Administrador";
+
+}
+
+// FOTO ADMIN
+
+const foto =
+localStorage.getItem("foto_admin_" + adminId);
+
+if(foto){
+
+document.getElementById("fotoAdminSidebar").src =
+foto;
+
+}
+
+// CARGAR DOCENTES
+
+cargarDocentes();
+
+}
+
+// CARGAR DOCENTES
+
+function cargarDocentes(){
+
+fetch("http://localhost:3000/docentes")
+
+.then(res => res.json())
+
+.then(data => {
+
+let tabla =
+document.getElementById("lista");
+
+tabla.innerHTML = "";
+
+data.forEach(d => {
+
+tabla.innerHTML += `
+
+<tr>
+
+<td>${d.nombre}</td>
+
+<td>${d.carrera || "Sin asignar"}</td>
+
+</tr>
+
+`;
+
+});
+
+});
+
+}
+
+// BUSCADOR
+
+function filtrar(){
+
+let input =
+document.getElementById("buscador")
+.value
+.toLowerCase();
+
+let filas =
+document.querySelectorAll("#lista tr");
+
+filas.forEach(f => {
+
+f.style.display =
+f.innerText.toLowerCase().includes(input)
+? ""
+: "none";
+
+});
+
+}
+
+// CERRAR SESIÓN
+
+function cerrarSesion(){
+
+localStorage.removeItem("usuario");
+
+window.location = "login.html";
+
+}
+
+// INICIAR TODO
+
+window.onload = iniciarPagina;
+
+</script>
+<a href="dashboard_admin.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>

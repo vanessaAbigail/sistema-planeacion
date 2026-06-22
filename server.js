@@ -1,0 +1,795 @@
+const express = require('express');
+const app = express();
+const path = require('path');
+const multer = require('multer');
+const mysql = require('mysql2');
+const cors = require('cors');
+const nodemailer = require("nodemailer");
+
+
+const fs = require("fs");
+const { google } = require("googleapis");
+
+// ======================================
+// CORREO
+// ======================================
+
+const transporter = nodemailer.createTransport({
+
+  service: "gmail",
+
+  auth: {
+
+    user: "abimartinez100817@gmail.com",
+
+    pass: "sqtv ugfb bbly nzol"
+
+  }
+
+});
+
+
+transporter.verify(function(error, success){
+
+  if(error){
+
+    console.log("❌ Error correo:", error);
+
+  }else{
+
+    console.log("✅ Correo listo para enviar");
+
+  }
+
+});
+
+// 🔥 CONEXIÓN BD
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "planeacion",
+});
+
+
+db.connect(err => {
+  if(err) throw err;
+  console.log("✅ Conectado a MySQL");
+});
+
+// 🔹 Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ======================================
+// GOOGLE DRIVE
+// ======================================
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: "credenciales.json",
+  scopes: ["https://www.googleapis.com/auth/drive"]
+});
+
+const drive = google.drive({
+  version: "v3",
+  auth
+});
+
+const DRIVE_FOLDER_ID =
+"1dtGRnGbe92viXzM7J0-4N__Nw4NDB7O-";
+
+async function subirADrive(file) {
+
+  const response = await drive.files.create({
+    requestBody: {
+      name: file.originalname,
+      parents: [DRIVE_FOLDER_ID]
+    },
+    media: {
+      mimeType: file.mimetype,
+      body: fs.createReadStream(file.path)
+    }
+  });
+
+  await drive.permissions.create({
+    fileId: response.data.id,
+    requestBody: {
+      role: "reader",
+      type: "anyone"
+    }
+  });
+
+  return `https://drive.google.com/file/d/${response.data.id}/view`;
+}
+
+// ============================
+// 🔥 LOGIN
+// ============================
+app.post("/login", (req, res) => {
+
+  const { correo, password } = req.body;
+
+  db.query(
+    "SELECT * FROM usuarios WHERE correo = ?",
+    [correo],
+    (err, result) => {
+
+      if (err) return res.json({ status: "error" });
+
+      if (result.length === 0) {
+        return res.json({ status: "error", mensaje: "Usuario no existe" });
+      }
+
+      const user = result[0];
+
+      if (user.password.trim() !== password.trim()) {
+        return res.json({ status: "error", mensaje: "Contraseña incorrecta" });
+      }
+
+      res.json({
+        status: "ok",
+        id: user.id,
+        nombre: user.nombre,
+        tipo: user.tipo
+      });
+
+    }
+  );
+
+});
+
+// ============================
+// 🔥 REGISTRO
+// ============================
+// ============================
+// 🔥 REGISTRO (CORREGIDO)
+// ============================
+app.post('/registro', (req, res) => {
+
+  const { nombre, correo, password, tipo } = req.body;
+
+  // 🔴 1. VALIDAR CAMPOS VACÍOS
+  if (!nombre || !correo || !password || !tipo) {
+    return res.json({
+      status: "error",
+      mensaje: "Faltan datos"
+    });
+  }
+
+  // 🔴 2. VERIFICAR SI YA EXISTE EL CORREO
+  db.query(
+    "SELECT * FROM usuarios WHERE correo = ?",
+    [correo],
+    (err, result) => {
+
+      if (err) {
+        console.log(err);
+        return res.json({ status: "error", mensaje: "Error servidor" });
+      }
+
+      if (result.length > 0) {
+        return res.json({
+          status: "error",
+          mensaje: "❌ Este correo ya está registrado"
+        });
+      }
+
+      // 🔥 3. INSERTAR USUARIO NUEVO
+      const sql = `
+        INSERT INTO usuarios (nombre, correo, password, tipo)
+        VALUES (?, ?, ?, ?)
+      `;
+
+      db.query(
+        sql,
+        [nombre, correo, password, tipo],
+        (err2) => {
+
+          if (err2) {
+            console.log(err2);
+            return res.json({
+              status: "error",
+              mensaje: "Error al registrar usuario"
+            });
+          }
+
+          res.json({
+            status: "ok",
+            mensaje: "✅ Usuario registrado correctamente"
+          });
+
+        }
+      );
+
+    }
+  );
+
+});
+// ============================
+// 🔥 ARCHIVOS
+// ============================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads'),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+});
+
+const upload = multer({ storage });
+
+// ============================
+// 🔥 PLANEACIONES
+// ============================
+app.post("/guardar-planeacion", upload.single("archivo"), (req, res) => {
+
+console.log("Datos recibidos:");
+console.log(req.body);
+
+const { periodo, carrera, grupo, materia, fecha, id_usuario } = req.body;
+
+  db.query(`
+    INSERT INTO planeaciones
+(periodo, carrera, grupo, materia, fecha, archivo, estado, id_usuario)
+VALUES (?,?,?,?,?, ?, 'pendiente', ?)
+  `, [
+  periodo,
+  carrera,
+  grupo,
+  materia,
+  fecha,
+  req.file ? req.file.filename : null,
+  id_usuario
+], () => {
+
+// 🔔 NOTIFICAR AL ADMIN
+db.query(
+  "SELECT nombre FROM usuarios WHERE id=?",
+  [id_usuario],
+  (err2, userData) => {
+
+    if(userData.length > 0){
+
+      const nombreDocente = userData[0].nombre;
+
+      db.query(
+        "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
+        [
+          1, // 👈 ID DEL ADMIN
+          "📄 " + nombreDocente + " envió una nueva planeación"
+        ]
+      );
+
+    }
+
+  }
+);
+
+
+
+    res.send("ok");
+  });
+
+});
+
+// 🔥 TODAS (ADMIN)
+app.get('/planeaciones', (req, res) => {
+  db.query("SELECT * FROM planeaciones", (err, result) => {
+    res.json(result);
+  });
+});
+
+// 🔥 SOLO DOCENTE
+app.get('/planeaciones-docente/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.query(
+    "SELECT * FROM planeaciones WHERE id_usuario = ?",
+    [id],
+    (err, result) => {
+      if(err) return res.json([]);
+      res.json(result);
+    }
+  );
+});
+
+app.delete('/eliminar-planeacion/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.query("DELETE FROM planeaciones WHERE id = ?", [id], (err, result) => {
+    if(err) return res.send("error");
+    if(result.affectedRows === 0) return res.send("no existe");
+    res.send("ok");
+  });
+});
+
+app.get('/planeacion/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.query("SELECT * FROM planeaciones WHERE id=?", [id], (err, result) => {
+    res.json(result[0]);
+  });
+});
+
+app.post('/editar-planeacion/:id', upload.single('archivo'), (req, res) => {
+
+  const id = req.params.id;
+  const { periodo, carrera, grupo, materia, fecha, comentarios } = req.body;
+
+  let sql = `UPDATE planeaciones SET periodo=?, carrera=?, grupo=?, materia=?, fecha=?, comentarios=?`;
+  let params = [periodo, carrera, grupo, materia, fecha, comentarios];
+
+  if(req.file){
+    sql += ", archivo=?";
+    params.push(req.file.filename);
+  }
+
+  sql += " WHERE id=?";
+  params.push(id);
+
+  db.query(sql, params, (err, result) => {
+    if(err) return res.send("error");
+    res.send("ok");
+  });
+
+});
+
+// ============================
+// 🔔 CAMBIAR ESTADO + NOTIFICAR
+// ============================
+app.put('/cambiar-estado/:id', (req, res) => {
+
+  const id = req.params.id;
+  const { estado } = req.body;
+
+  console.log("CAMBIANDO ESTADO:", id, estado); // 👈 DEBUG
+
+  // 1. ACTUALIZAR ESTADO
+  db.query(
+    "UPDATE planeaciones SET estado=? WHERE id=?",
+    [estado, id],
+    (err) => {
+
+      if(err){
+        console.log("ERROR UPDATE:", err);
+        return res.json({ status:"error" });
+      }
+
+      // 2. OBTENER ID DEL DOCENTE
+      db.query(
+        "SELECT id_usuario FROM planeaciones WHERE id=?",
+        [id],
+        (err2, data) => {
+
+          if(err2){
+            console.log("ERROR SELECT:", err2);
+            return res.json({ status:"error" });
+          }
+
+          if(data.length === 0){
+            console.log("NO ENCONTRÓ USUARIO");
+            return res.json({ status:"error" });
+          }
+
+          const id_usuario = data[0].id_usuario;
+
+          console.log("ID DOCENTE:", id_usuario); // 👈 DEBUG
+
+          // 3. CREAR NOTIFICACIÓN
+          db.query(
+            "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
+            [id_usuario, "Tu planeación fue " + estado],
+            (err3) => {
+
+              if(err3){
+                console.log("ERROR INSERT:", err3);
+                return res.json({ status:"error" });
+              }
+
+              console.log("NOTIFICACIÓN CREADA"); // 👈 DEBUG
+
+              res.json({ status:"ok" });
+
+            }
+          );
+
+        }
+      );
+
+    }
+  );
+
+});
+
+
+
+// ============================
+// 🔥 HORARIOS
+// ============================
+app.post("/guardar-horario", (req, res) => {
+
+const {
+id_docente,
+periodo,
+dia,
+hora,
+materia,
+grupo,
+carrera
+} = req.body;
+
+if (!id_docente || !periodo || !dia || !hora || !materia || !grupo || !carrera) {
+
+return res.json({
+status: "error",
+mensaje: "Faltan datos"
+});
+
+}
+
+const sql = `
+INSERT INTO horarios
+(id_docente, periodo, dia, hora, materia, grupo, carrera)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+`;
+
+db.query(
+sql,
+[id_docente, periodo, dia, hora, materia, grupo, carrera],
+(err) => {
+
+if(err){
+console.log(err);
+return res.json({ status: "error" });
+}
+
+res.json({
+status: "ok",
+mensaje: "Horario guardado correctamente"
+});
+
+});
+
+});
+
+// 🔥 HORARIOS POR DOCENTE
+app.get("/horarios/:id", (req, res) => {
+
+  const id = req.params.id;
+
+  db.query("SELECT * FROM horarios WHERE id_docente = ?", [id], (err, result) => {
+    if(err) return res.json([]);
+    res.json(result);
+  });
+
+});
+
+// ============================
+// ✏️ EDITAR HORARIO (AGREGADO)
+// ============================
+app.put('/horarios/:id', (req, res) => {
+
+  const id = req.params.id;
+  const { dia, hora, materia, grupo, carrera } = req.body;
+
+  const sql = `
+    UPDATE horarios 
+    SET dia=?, hora=?, materia=?, grupo=?, carrera=?
+    WHERE id=?
+  `;
+
+  db.query(sql, [dia, hora, materia, grupo, carrera, id], (err) => {
+
+    if (err) {
+      return res.json({ status: "error" });
+    }
+
+    res.json({
+      status: "ok",
+      mensaje: "Horario actualizado correctamente"
+    });
+
+  });
+
+});
+
+// ============================
+// 🗑️ ELIMINAR HORARIO (AGREGADO)
+// ============================
+app.delete('/horarios/:id', (req, res) => {
+
+  const id = req.params.id;
+
+  db.query("DELETE FROM horarios WHERE id=?", [id], (err, result) => {
+
+    if (err) return res.json({ status: "error" });
+
+    res.json({
+      status: "ok",
+      mensaje: "Horario eliminado correctamente"
+    });
+
+  });
+
+});
+
+// ============================
+// 🔥 NOTIFICACIONES
+// ============================
+app.post('/crear-notificacion', (req, res) => {
+
+  const { id_usuario, mensaje } = req.body;
+
+  db.query("INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)", 
+  [id_usuario, mensaje], () => {
+    res.json({ status: "ok" });
+  });
+
+});
+
+app.get('/notificaciones/:id', (req, res) => {
+
+  const id = req.params.id;
+
+  db.query(
+    "SELECT * FROM notificaciones WHERE id_usuario=? ORDER BY fecha DESC",
+    [id],
+    (err, result) => {
+      if(err) return res.json([]);
+      res.json(result);
+    }
+  );
+
+});
+
+// ============================
+// 🔥 DOCENTES
+// ============================
+app.get('/docentes', (req, res) => {
+  db.query(`
+    SELECT u.nombre, 
+    COALESCE(MAX(h.carrera), 'Sin asignar') as carrera
+    FROM usuarios u
+    LEFT JOIN horarios h ON u.id = h.id_docente
+    WHERE u.tipo='docente'
+    GROUP BY u.id
+  `, (err, result) => {
+    if(err) return res.json([]);
+    res.json(result);
+  });
+});
+
+// ============================
+// 🔥 RUTA PRINCIPAL
+// ============================
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// 🔥 TODOS LOS HORARIOS (ADMIN)
+app.get("/horarios", (req, res) => {
+
+  db.query(`
+    SELECT h.*, u.nombre 
+    FROM horarios h
+    JOIN usuarios u ON h.id_docente = u.id
+  `, (err, result) => {
+
+    if(err) return res.json([]);
+    res.json(result);
+
+  });
+
+});
+
+// ============================
+// 🔥 GRUPOS GUARDADO AUTOMATICO
+// ============================
+app.get('/grupos', (req, res) => {
+
+db.query(`
+SELECT DISTINCT
+p.grupo,
+p.materia,
+p.carrera,
+u.nombre as docente
+
+FROM planeaciones p
+
+JOIN usuarios u
+ON p.id_usuario = u.id
+`,
+(err, result) => {
+
+if(err) return res.json([]);
+
+res.json(result);
+
+});
+
+});
+
+// 🔥 APROBAR / RECHAZAR PLANEACION
+app.put("/estado-planeacion/:id", (req, res) => {
+
+  const id = req.params.id;
+  const { estado } = req.body;
+
+  db.query(
+    "UPDATE planeaciones SET estado=? WHERE id=?",
+    [estado, id],
+    (err, result) => {
+
+      if(err) return res.json({ mensaje: "Error" });
+
+      res.json({ mensaje: "Estado actualizado" });
+
+    }
+  );
+
+});
+
+// ============================
+// 🔔 MARCAR COMO LEÍDAS
+// ============================
+app.post('/leer-notificaciones', (req, res) => {
+
+  const { id_usuario } = req.body;
+
+  db.query(
+    "DELETE FROM notificaciones WHERE id_usuario=?",
+    [id_usuario],
+    () => {
+      res.json({ status: "ok" });
+    }
+  );
+
+});
+
+
+
+// ENVIAR CÓDIGO
+app.post("/enviar-codigo", (req, res) => {
+
+  const { correo } = req.body;
+
+  const codigo =
+  Math.floor(100000 + Math.random() * 900000);
+
+  db.query(
+    "UPDATE usuarios SET codigo_recuperacion=? WHERE correo=?",
+    [codigo, correo],
+    (err, result) => {
+
+      if(err){
+        console.log(err);
+        return res.json({
+          mensaje:"Error servidor"
+        });
+      }
+
+      if(result.affectedRows === 0){
+        return res.json({
+          mensaje:"Correo no encontrado"
+        });
+      }
+
+      transporter.sendMail({
+
+        from: "TU_CORREO@gmail.com",
+
+        to: correo,
+
+        subject: "Recuperación de contraseña",
+
+        html: `
+        <div style="font-family:Arial;text-align:center">
+
+        <h2>Recuperación de contraseña</h2>
+
+        <p>Tu código es:</p>
+
+        <h1 style="color:#2e7d32">
+        ${codigo}
+        </h1>
+
+        </div>
+        `
+
+      }, (error) => {
+
+        if(error){
+          console.log(error);
+
+          return res.json({
+            mensaje:"Error al enviar correo"
+          });
+        }
+
+        res.json({
+          mensaje:"Código enviado correctamente"
+        });
+
+      });
+
+    }
+  );
+
+});
+
+
+// VERIFICAR CÓDIGO
+app.post("/verificar-codigo", (req, res) => {
+
+  const {
+    correo,
+    codigo,
+    nueva
+  } = req.body;
+
+  db.query(
+
+    "SELECT codigo_recuperacion FROM usuarios WHERE correo=?",
+
+    [correo],
+
+    (err, result) => {
+
+      if(err){
+        return res.json({
+          mensaje:"Error servidor"
+        });
+      }
+
+      if(result.length === 0){
+        return res.json({
+          mensaje:"Correo no encontrado"
+        });
+      }
+
+      if(
+        result[0].codigo_recuperacion != codigo
+      ){
+        return res.json({
+          mensaje:"Código incorrecto"
+        });
+      }
+
+      db.query(
+
+        "UPDATE usuarios SET password=?, codigo_recuperacion=NULL WHERE correo=?",
+
+        [nueva, correo],
+
+        (err2) => {
+
+          if(err2){
+            return res.json({
+              mensaje:"Error servidor"
+            });
+          }
+
+          res.json({
+            status:"ok",
+            mensaje:"Contraseña actualizada correctamente"
+          });
+
+        }
+
+      );
+
+    }
+
+  );
+
+});
+
+
+// ============================
+// 🚀 SERVIDOR
+// ============================
+// Debe quedar algo así:
+app.listen(3000, '0.0.0.0', () => {
+  console.log("Servidor corriendo");
+});
+

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Registro - Sistema de Planeación</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body class="login-body">
+
+<div class="login-box">
+
+<img src="img/logo.jpg" class="logo">
+
+<h2>REGISTRO</h2>
+
+<!-- 🔥 NOMBRE -->
+<div class="input-box">
+<i class="fa fa-user"></i>
+<input type="text" id="nombre" placeholder="Nombre">
+</div>
+
+<!-- 🔥 CORREO -->
+<div class="input-box">
+<i class="fa fa-envelope"></i>
+<input type="text" id="correo" placeholder="Correo electrónico">
+</div>
+
+<!-- 🔹 Contraseña -->
+<div class="input-box">
+<i class="fa fa-lock"></i>
+<input type="password" id="password" placeholder="Contraseña">
+</div>
+
+<!-- 🔹 Confirmar contraseña -->
+<div class="input-box">
+<i class="fa fa-lock"></i>
+<input type="password" id="confirmPassword" placeholder="Confirmar contraseña">
+</div>
+
+<!-- 🔹 Tipo de usuario -->
+<div class="input-box">
+<i class="fa fa-users"></i>
+<select id="tipoUsuario">
+  <option value="">Selecciona tipo de usuario</option>
+  <option value="docente">Docente</option>
+  <option value="administrador">Administrador</option>
+</select>
+</div>
+
+<div class="acciones">
+<button id="btnRegistrar">Registrar</button>
+</div>
+
+<p class="registro">
+¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
+</p>
+
+</div>
+
+<script>
+document.getElementById("btnRegistrar").addEventListener("click", function(){
+
+  const nombre = document.getElementById("nombre").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const confirmPassword = document.getElementById("confirmPassword").value.trim();
+  const tipoUsuario = document.getElementById("tipoUsuario").value;
+
+  if(!nombre || !correo || !password || !confirmPassword || !tipoUsuario){
+    alert("Por favor completa todos los campos");
+    return;
+  }
+
+  if(password !== confirmPassword){
+    alert("Las contraseñas no coinciden");
+    return;
+  }
+
+  fetch("http://localhost:3000/registro", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      nombre: nombre,
+      correo: correo,
+      password: password,
+      tipo: tipoUsuario
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === "ok"){
+      alert("Registrado exitosamente");
+      window.location.href = "login.html";
+    } else {
+      alert("Error al registrar");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error al conectar con el servidor");
+  });
+
+});
+</script>
+
+</body>
+</html>

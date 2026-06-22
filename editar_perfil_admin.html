@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Editar Perfil Administrador</title>
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body class="panel-body">
+
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<ul>
+<li><a href="dashboard_admin.html">🏠 Menú</a></li>
+<li><a href="planeaciones_admin.html">📋 Planeaciones</a></li>
+<li><a href="docentes.html">👨‍🏫 Docentes</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="grupos.html">👥 Grupos</a></li>
+<li><a href="perfil_admin.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<div class="contenido">
+
+<h1 class="titulo">Editar Perfil Administrador</h1>
+
+<!-- PANEL -->
+<div class="user-panel">
+
+<img id="fotoUsuario" src="img/perfiles/default.png" class="user-icon" onclick="toggleMenu()">
+
+<div id="menuUsuario" class="menu-usuario">
+<a href="perfil_admin.html">👤 Ver perfil</a>
+<a href="login.html">🚪 Cerrar sesión</a>
+</div>
+
+</div>
+
+<div class="editar-perfil">
+
+<!-- FOTO -->
+<div class="foto-editar">
+
+<img id="preview" src="img/perfiles/default.png">
+
+<input type="file" id="inputFoto" style="display:none">
+
+<button type="button" onclick="document.getElementById('inputFoto').click()">
+Cambiar Foto
+</button>
+
+</div>
+
+<!-- FORMULARIO MEJORADO -->
+<form onsubmit="guardarAdmin(event)">
+
+<input type="text" id="nombre" placeholder="Nombre">
+<input type="email" id="correo" placeholder="Correo">
+<input type="text" id="telefono" placeholder="Teléfono">
+
+<input type="text" id="area" placeholder="Área (Ej: Control Escolar)">
+<input type="text" id="matricula" placeholder="ID / Matrícula">
+
+<select id="rol">
+<option value="Seleccionar">Seleccionar</option>
+<option value="Administrador">Administrador</option>
+</select>
+
+
+<button type="submit">Guardar</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+const adminId = "admin";
+
+// 🔥 FOTO
+document.getElementById("inputFoto").addEventListener("change", function(e){
+
+const file = e.target.files[0];
+
+if(file){
+const reader = new FileReader();
+
+reader.onload = function(e){
+
+localStorage.setItem("foto_admin_" + adminId, e.target.result);
+localStorage.setItem("perfil_admin_" + adminId, JSON.stringify(datos));
+
+document.getElementById("preview").src = e.target.result;
+document.getElementById("fotoUsuario").src = e.target.result;
+
+};
+
+reader.readAsDataURL(file);
+}
+
+});
+
+// 🔥 GUARDAR PERFIL COMPLETO
+function guardarAdmin(e){
+
+e.preventDefault();
+
+const datos = {
+nombre: nombre.value,
+correo: correo.value,
+telefono: telefono.value,
+area: area.value,
+matricula: matricula.value,
+rol: rol.value,
+};
+
+localStorage.setItem("perfil_admin_" + adminId, JSON.stringify(datos));
+
+alert("Perfil actualizado correctamente ✅");
+
+window.location = "perfil_admin.html";
+}
+
+// 🔥 CARGAR DATOS
+window.onload = function(){
+
+const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+if(datos){
+nombre.value = datos.nombre || "";
+correo.value = datos.correo || "";
+telefono.value = datos.telefono || "";
+area.value = datos.area || "";
+matricula.value = datos.matricula || "";
+rol.value = datos.rol || "Administrador";
+}
+
+// FOTO
+const foto = localStorage.getItem("foto_admin_" + adminId);
+
+if(foto){
+document.getElementById("preview").src = foto;
+document.getElementById("fotoUsuario").src = foto;
+}
+
+}
+
+// MENÚ
+function toggleMenu(){
+let menu = document.getElementById("menuUsuario");
+menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+</script>
+<a href="dashboard_admin.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>

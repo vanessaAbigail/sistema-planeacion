@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Planeaciones - Administrador</title>
+
+<link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body class="panel-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoAdminSidebar" src="img/perfiles/default.png" class="foto-admin">
+
+<p class="nombre-admin" id="nombreAdmin">
+VANESSA ABIGAIL<br>MARTÍNEZ ALPÍZAR
+</p>
+
+<span class="rol">Administrador</span>
+
+</div>
+</div>
+
+<ul>
+<li><a href="dashboard_admin.html" class="activo">🏠 Menú</a></li>
+<li><a href="planeaciones_admin.html">📋 Planeaciones</a></li>
+<li><a href="docentes.html">👨‍🏫 Docentes</a></li>
+<li><a href="horarios_admin.html">⏰ Horarios</a></li>
+<li><a href="grupos.html">👥 Grupos / Asignaturas</a></li>
+<li><a href="perfil_admin.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">Planeaciones</h1>
+
+<div class="user-panel">
+<img id="fotoAdminTop" src="img/perfiles/default.png" class="user-icon">
+</div>
+
+<!-- FILTROS -->
+<div class="filtros">
+
+
+
+<input
+type="text"
+id="buscarPlaneacion"
+placeholder="Buscar por materia, carrera, grupo o periodo..."
+onkeyup="filtrarPlaneaciones()">
+
+</div>
+
+<!-- TABLA -->
+<div class="tabla-box">
+
+<table class="tabla">
+
+<thead>
+<tr>
+<th>Periodo</th>
+<th>Carrera</th>
+<th>Materia</th>
+<th>Grupo</th>
+<th>Fecha</th>
+<th>Planeación</th>
+<th>Estado</th>
+</tr>
+</thead>
+
+<tbody id="tablaPlaneaciones"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+// ADMIN
+const adminId = "admin";
+
+// DATOS
+const datos = JSON.parse(localStorage.getItem("perfil_admin_admin"));
+
+if(datos){
+document.getElementById("nombreAdmin").innerText =
+datos.nombre || "Administrador";
+}
+
+// FOTO
+const foto = localStorage.getItem("foto_admin_admin");
+const defaultFoto = "img/perfiles/default.png";
+
+document.getElementById("fotoAdminSidebar").src =
+foto ? foto : defaultFoto;
+
+document.getElementById("fotoAdminTop").src =
+foto ? foto : defaultFoto;
+
+
+// CARGAR PLANEACIONES
+
+function cargarPlaneaciones(){
+
+fetch("http://localhost:3000/planeaciones")
+
+.then(res => res.json())
+
+.then(data => {
+
+let tabla = document.getElementById("tablaPlaneaciones");
+
+tabla.innerHTML = "";
+
+let carreras = new Set();
+let grupos = new Set();
+
+data.forEach(p => {
+
+carreras.add(p.carrera);
+grupos.add(p.grupo);
+
+tabla.innerHTML += `
+
+<tr>
+
+<td>${p.periodo}</td>
+<td>${p.carrera}</td>
+<td>${p.materia}</td>
+<td>${p.grupo}</td>
+<td>${p.fecha}</td>
+
+<td>
+
+${p.archivo
+
+? `<a href="${p.archivo}" target="_blank">
+📄 Ver
+</a>`
+
+: 'Sin archivo'}
+
+</td>
+
+<td>
+
+<select onchange="cambiarEstado(${p.id}, this.value)">
+
+<option ${p.estado=="pendiente"?"selected":""}>
+pendiente
+</option>
+
+<option ${p.estado=="aprobado"?"selected":""}>
+aprobado
+</option>
+
+<option ${p.estado=="rechazado"?"selected":""}>
+rechazado
+</option>
+
+</select>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+// SELECTS
+
+let selectCarrera = document.getElementById("carrera");
+let selectGrupo = document.getElementById("grupo");
+
+selectCarrera.innerHTML =
+'<option value="">Carrera</option>';
+
+selectGrupo.innerHTML =
+'<option value="">Grupo</option>';
+
+carreras.forEach(c => {
+selectCarrera.innerHTML += `<option>${c}</option>`;
+});
+
+grupos.forEach(g => {
+selectGrupo.innerHTML += `<option>${g}</option>`;
+});
+
+});
+
+}
+
+// FILTRAR
+
+function filtrarPlaneaciones(){
+
+let texto =
+document.getElementById("buscarPlaneacion")
+.value
+.toLowerCase();
+
+let filas =
+document.querySelectorAll("#tablaPlaneaciones tr");
+
+filas.forEach(fila => {
+
+let contenido =
+fila.innerText.toLowerCase();
+
+fila.style.display =
+contenido.includes(texto)
+? ""
+: "none";
+
+});
+
+}
+
+// CAMBIAR ESTADO
+
+function cambiarEstado(id, estado){
+
+fetch("http://localhost:3000/cambiar-estado/" + id, {
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+estado:estado
+})
+
+})
+
+.then(res => res.json())
+
+.then(() => {
+alert("✅ Estado actualizado");
+});
+
+}
+
+// INICIO
+
+window.onload = function(){
+cargarPlaneaciones();
+}
+
+</script>
+<a href="dashboard_admin.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>

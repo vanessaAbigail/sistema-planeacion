@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Horarios - Administrador</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="panel-body">
+
+<!-- 🔒 PROTEGER ADMIN -->
+<script>
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario || usuario.tipo !== "administrador"){
+  alert("⚠️ Acceso solo administrador");
+  window.location = "login.html";
+}
+</script>
+
+<!-- SIDEBAR ADMIN -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN<br>ACADÉMICA</h3>
+</div>
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoAdminSidebar" src="img/perfiles/default.png">
+<p id="nombreAdmin">Administrador</p>
+<span id="rolAdmin">Administrador</span>
+
+</div>
+</div>
+
+<ul>
+<li><a href="dashboard_admin.html">🏠 Menú</a></li>
+<li><a href="planeaciones_admin.html">📋 Planeaciones</a></li>
+<li><a href="docentes.html">👨‍🏫 Docentes</a></li>
+<li class="active"><a href="#">⏰ Horarios</a></li>
+<li><a href="grupos.html">👥 Grupos / Asignaturas</a></li>
+<li><a href="perfil_admin.html">👤 Mi Perfil</a></li>
+<li><a href="#" onclick="cerrarSesion()">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">HORARIOS (ADMIN)</h1>
+
+
+
+<!-- 🔍 BUSCADOR POR DOCENTE -->
+<div style="margin:15px 0;">
+<input 
+type="text" 
+id="buscadorDocente" 
+placeholder="Buscar por docente..." 
+onkeyup="filtrarDocente()" 
+style="padding:10px; width:250px; border-radius:8px; border:1px solid #ccc;">
+</div>
+
+<!-- 🔥 TABLA NUEVA -->
+<div class="tabla-box">
+
+<table class="tabla">
+<thead>
+<tr>
+<th>Docente</th>
+<th>Día</th>
+<th>Hora</th>
+<th>Materia</th>
+<th>Grupo</th>
+<th>Carrera</th>
+</tr>
+</thead>
+
+<tbody id="tablaHorarios"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔥 CARGAR DATOS ADMIN
+const adminId = "admin";
+
+window.onload = function(){
+
+// PERFIL
+const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+if(datos){
+document.getElementById("nombreAdmin").innerText = datos.nombre || "Administrador";
+}
+
+// FOTO
+const foto = localStorage.getItem("foto_admin_" + adminId);
+
+if(foto){
+document.getElementById("fotoAdminSidebar").src = foto;
+}
+
+// 🔥 CARGAR HORARIOS
+cargarHorarios();
+
+}
+
+// 🔥 FUNCIÓN NUEVA
+function cargarHorarios(){
+
+fetch("http://localhost:3000/horarios")
+.then(res => res.json())
+.then(data => {
+
+let tabla = document.getElementById("tablaHorarios");
+tabla.innerHTML = "";
+
+if(data.length === 0){
+tabla.innerHTML = "<tr><td colspan='6'>No hay horarios registrados</td></tr>";
+return;
+}
+
+data.forEach(h => {
+
+tabla.innerHTML += `
+<tr>
+<td>${h.nombre}</td>
+<td>${h.dia}</td>
+<td>${h.hora}</td>
+<td>${h.materia}</td>
+<td>${h.grupo}</td>
+<td>${h.carrera}</td>
+</tr>
+`;
+
+});
+
+});
+
+}
+
+// 🚪 CERRAR SESIÓN
+function cerrarSesion(){
+localStorage.removeItem("usuario");
+window.location = "login.html";
+}
+
+// 🔍 FILTRAR POR DOCENTE (AGREGADO)
+function filtrarDocente(){
+let input = document.getElementById("buscadorDocente").value.toLowerCase();
+let filas = document.querySelectorAll("#tablaHorarios tr");
+
+filas.forEach(fila => {
+let nombre = fila.children[0].innerText.toLowerCase();
+fila.style.display = nombre.includes(input) ? "" : "none";
+});
+}
+
+</script>
+<a href="dashboard_admin.html" class="btn-menu">
+🏠 Menú
+</a>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Editar Planeación</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="panel-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div class="logo-panel">
+<img src="img/logo.jpg">
+<h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
+</div>
+
+<div class="admin-info">
+<div class="admin-info-box">
+
+<img id="fotoDocenteSidebar"
+src="img/perfiles/default.png">
+
+<p id="nombreDocenteSidebar">
+Docente
+</p>
+
+<span id="rolDocenteSidebar">
+Docente
+</span>
+
+</div>
+</div>
+<ul>
+<li><a href="dashboard.html">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html">✏️ Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html" class="active">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
+</ul>
+
+</div>
+
+<!-- CONTENIDO -->
+<div class="contenido">
+
+<h1 class="titulo">Editar Planeación</h1>
+
+<div class="form-container">
+
+<form id="formEditar" class="form-planeacion">
+
+<div class="campo">
+<label>Periodo</label>
+<input type="text" id="periodo">
+</div>
+
+<div class="campo">
+<label>Carrera</label>
+<input type="text" id="carrera">
+</div>
+
+<div class="campo">
+<label>Grupo</label>
+<input type="text" id="grupo">
+</div>
+
+<div class="campo">
+<label>Materia</label>
+<input type="text" id="materia">
+</div>
+
+<div class="campo">
+<label>Fecha</label>
+<input type="date" id="fecha">
+</div>
+
+<div class="campo">
+<label>Archivo</label>
+
+<input type="file" id="archivo" style="display:none">
+
+<button
+type="button"
+class="btn-principal"
+onclick="document.getElementById('archivo').click()">
+📎 Cambiar Archivo
+</button>
+
+<p id="nombreArchivo"></p>
+
+</div>
+
+<div class="botones-formulario">
+
+<button type="submit" class="btn-principal">
+💾 Guardar Cambios
+</button>
+
+<a href="ver_planeaciones.html" class="btn-secundario">
+↩️ Cancelar
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+// ================= FUNCIONALIDAD =================
+
+const id = new URLSearchParams(window.location.search).get("id");
+
+// 🔥 CARGAR
+fetch("http://localhost:3000/planeacion/"+id)
+.then(res=>res.json())
+.then(p=>{
+document.getElementById("periodo").value = p.periodo;
+document.getElementById("carrera").value = p.carrera;
+document.getElementById("grupo").value = p.grupo;
+document.getElementById("materia").value = p.materia;
+document.getElementById("fecha").value = p.fecha;
+});
+
+document.getElementById("archivo").addEventListener("change", function(){
+
+if(this.files[0]){
+
+document.getElementById("nombreArchivo").innerText =
+"📄 " + this.files[0].name;
+
+}
+
+});
+
+// 🔥 GUARDAR
+document.getElementById("formEditar").addEventListener("submit", e=>{
+e.preventDefault();
+
+let formData = new FormData();
+
+formData.append("periodo", document.getElementById("periodo").value);
+formData.append("carrera", document.getElementById("carrera").value);
+formData.append("grupo", document.getElementById("grupo").value);
+formData.append("materia", document.getElementById("materia").value);
+formData.append("fecha", document.getElementById("fecha").value);
+
+
+if(document.getElementById("archivo").files[0]){
+formData.append("archivo", document.getElementById("archivo").files[0]);
+}
+
+fetch("http://localhost:3000/editar-planeacion/"+id,{
+method:"POST",
+body:formData
+})
+.then(res=>res.text())
+.then(data=>{
+if(data==="ok"){
+alert("Planeación actualizada ✅");
+window.location="ver_planeaciones.html";
+}else{
+alert("Error ❌");
+}
+});
+
+});
+
+
+const usuario =
+JSON.parse(localStorage.getItem("usuario")) || {};
+
+const datosPerfil =
+JSON.parse(localStorage.getItem("perfil_" + usuario.id));
+
+if(datosPerfil){
+
+document.getElementById("nombreDocenteSidebar").innerText =
+datosPerfil.nombre || "Docente";
+
+}
+
+const fotoGuardada =
+localStorage.getItem("fotoPerfil_" + usuario.id);
+
+if(fotoGuardada){
+
+document.getElementById("fotoDocenteSidebar").src =
+fotoGuardada;
+
+}
+</script>
+
+</body>
+</html>
