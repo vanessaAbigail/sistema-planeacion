@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<title>Login - Sistema de Planeación</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body class="login-body">
+
+<div class="login-box">
+
+<img src="img/logo.jpg" class="logo">
+
+<h2>INICIAR SESIÓN</h2>
+
+<div class="input-box">
+<i class="fa fa-user"></i>
+<input type="text" id="correo" placeholder="Usuario">
+</div>
+
+<div class="input-box">
+<i class="fa fa-lock"></i>
+<input type="password" id="password" placeholder="Contraseña">
+</div>
+
+<p class="forgot">
+<a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+</p>
+
+<div class="acciones">
+<button id="btnLogin" onclick="login()">Iniciar sesión</button>
+</div>
+
+<p class="registro">
+¿No tienes cuenta? <a href="registro.html">Registrarte</a>
+</p>
+
+</div>
+
+<script>
+
+document.addEventListener("keypress", function(e){
+  if(e.key === "Enter"){
+    login();
+  }
+});
+
+function login(){
+
+const correo = document.getElementById("correo").value.trim();
+const password = document.getElementById("password").value.trim();
+const btn = document.getElementById("btnLogin");
+
+// VALIDACIÓN
+if(!correo || !password){
+  alert("⚠️ Por favor llena todos los campos");
+  return;
+}
+
+// LOADING
+btn.innerText = "Ingresando...";
+btn.disabled = true;
+
+fetch("http://localhost:3000/login",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+correo,
+password
+})
+})
+.then(res => res.json())
+.then(data => {
+
+console.log("RESPUESTA LOGIN:", data);
+
+if(data.status === "ok"){
+
+  localStorage.setItem("usuario", JSON.stringify({
+    id: data.id,
+    nombre: data.nombre,
+    correo: correo,
+    tipo: data.tipo
+  }));
+
+  localStorage.setItem("id", data.id);
+  localStorage.setItem("rol", data.tipo);
+
+  if(data.tipo === "administrador"){
+    window.location = "dashboard_admin.html";
+  }else{
+    window.location = "dashboard.html";
+  }
+
+}else{
+  alert("❌ Usuario o contraseña incorrectos");
+}
+
+})
+.catch((err)=>{
+console.log(err);
+alert("⚠️ Error al conectar con el servidor");
+})
+.finally(()=>{
+btn.innerText = "Iniciar sesión";
+btn.disabled = false;
+});
+
+}
+
+</script>
+
+</body>
+</html>
