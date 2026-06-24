@@ -213,8 +213,15 @@ cargar();
 
 // 🔥 VISOR
 function verDocumento(archivo){
-document.getElementById("visor").style.display = "flex";
-document.getElementById("frameDoc").src = "http://localhost:3000/uploads/" + archivo;
+
+  if (archivo.includes("drive.google.com")) {
+    window.open(archivo, "_blank");
+    return;
+  }
+
+  document.getElementById("visor").style.display = "flex";
+  document.getElementById("frameDoc").src =
+    "http://localhost:3000/uploads/" + archivo;
 }
 
 function cerrarVisor(){

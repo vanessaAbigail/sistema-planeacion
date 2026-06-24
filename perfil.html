@@ -105,6 +105,9 @@ Docente
 
 <script>
 
+// 🔥 BASE URL (CAMBIA SOLO AQUÍ EN PRODUCCIÓN)
+const API = "http://localhost:3000";
+
 // USUARIO
 const usuario = JSON.parse(localStorage.getItem("usuario")) || {};
 let userId = usuario.id || "default";
@@ -122,7 +125,7 @@ document.getElementById("menuUsuario").style.display = "none";
 }
 });
 
-// CARGAR PERFIL
+// CARGAR PERFIL (LOCALSTORAGE)
 const datos = JSON.parse(localStorage.getItem("perfil_" + userId));
 
 if(datos){
@@ -130,41 +133,16 @@ document.getElementById("nombreCompletoPerfil").innerText =
 datos.nombre;
 
 document.getElementById("datosPerfil").innerHTML = `
-
-<p>
-<span class="titulo-dato">📅 Fecha de nacimiento</span>
-${datos.fecha}
-</p>
-
-<p>
-<span class="titulo-dato">🆔 CURP</span>
-${datos.curp}
-</p>
-
-<p>
-<span class="titulo-dato">📱 Teléfono</span>
-${datos.telefono}
-</p>
-
-<p>
-<span class="titulo-dato">📧 Correo</span>
-${datos.correo}
-</p>
-
-<p>
-<span class="titulo-dato">🎓 Matrícula</span>
-${datos.matricula}
-</p>
-
-<p>
-<span class="titulo-dato">👤 Género</span>
-${datos.genero}
-</p>
-
+<p><span class="titulo-dato">📅 Fecha de nacimiento</span> ${datos.fecha}</p>
+<p><span class="titulo-dato">🆔 CURP</span> ${datos.curp}</p>
+<p><span class="titulo-dato">📱 Teléfono</span> ${datos.telefono}</p>
+<p><span class="titulo-dato">📧 Correo</span> ${datos.correo}</p>
+<p><span class="titulo-dato">🎓 Matrícula</span> ${datos.matricula}</p>
+<p><span class="titulo-dato">👤 Género</span> ${datos.genero}</p>
 `;
 }
 
-// CARGAR FOTO
+// FOTO PERFIL
 const foto = localStorage.getItem("fotoPerfil_" + userId);
 
 if(foto && foto !== "null" && foto !== "undefined"){

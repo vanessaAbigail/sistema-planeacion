@@ -10,26 +10,20 @@
 <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body class="panel-body">
 
-<button class="menu-toggle" onclick="toggleSidebar()">
-☰
-</button>
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
 
 <!-- HEADER -->
 <header class="header">
 
-    <!-- ICONOS DERECHA -->
     <div class="right-icons">
 
-        <!-- NOTIFICACIONES -->
         <div class="notification" onclick="verNotificaciones()">
             🔔
             <span class="badge" id="contador">0</span>
         </div>
 
-        <!-- FOTO PERFIL -->
         <img
             id="fotoUsuario"
             src="img/perfiles/default.png"
@@ -42,7 +36,7 @@
 
 </header>
 
-<!-- 🔥 SIDEBAR -->
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
 
 <div class="logo-panel">
@@ -56,355 +50,193 @@
 <img id="fotoDocenteSidebar"
 src="img/perfiles/default.png">
 
-<p id="nombreDocenteSidebar">
-    Docentes
-</p>
+<p id="nombreDocenteSidebar">Docentes</p>
 
-<span id="rolDocenteSidebar">
-Docente
-</span>
+<span id="rolDocenteSidebar">Docente</span>
 
 </div>
 </div>
 
 <ul>
-
-<li>
-<a href="dashboard.html" class="active">
-🏠 Menú
-</a>
-</li>
-
-<li>
-<a href="crear_planeacion.html">
-✏️ Crear Planeación
-</a>
-</li>
-
-<li>
-<a href="ver_planeaciones.html">
-📄 Ver Planeaciones
-</a>
-</li>
-
-<li>
-<a href="horarios.html">
-⏰ Horarios
-</a>
-</li>
-
-<li>
-<a href="perfil.html">
-👤 Mi Perfil
-</a>
-</li>
-
-<li>
-<a href="login.html">
-🚪 Cerrar Sesión
-</a>
-</li>
-
+<li><a href="dashboard.html" class="active">🏠 Menú</a></li>
+<li><a href="crear_planeacion.html">✏️ Crear Planeación</a></li>
+<li><a href="ver_planeaciones.html">📄 Ver Planeaciones</a></li>
+<li><a href="horarios.html">⏰ Horarios</a></li>
+<li><a href="perfil.html">👤 Mi Perfil</a></li>
+<li><a href="login.html">🚪 Cerrar Sesión</a></li>
 </ul>
 
 </div>
 
-<!-- 🔥 CONTENIDO -->
+<!-- CONTENIDO -->
 <div class="contenido">
 
-    <h1 class="titulo">
+<h1 class="titulo">
 ¡BIENVENIDO AL SISTEMA DE<br>
 PLANEACIÓN ACADÉMICA!
 </h1>
 
-<!-- 🔥 MENÚ USUARIO -->
+<!-- MENÚ USUARIO -->
 <div id="menuUsuario" class="menu-usuario">
 
-<a href="perfil.html">
-👤 Mi Perfil
-</a>
-
-<a href="editar_perfil.html">
-✏️ Editar Perfil
-</a>
-
-<a href="login.html">
-🚪 Cerrar Sesión
-</a>
+<a href="perfil.html">👤 Mi Perfil</a>
+<a href="editar_perfil.html">✏️ Editar Perfil</a>
+<a href="login.html">🚪 Cerrar Sesión</a>
 
 </div>
 
-<!-- 🔥 DASHBOARD -->
-
+<!-- CARDS -->
 <div class="cards">
 
-<!-- CARD PERFIL -->
 <div class="card" onclick="location.href='perfil.html'">
-
-<img
-src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png"
-alt="Perfil"
->
-
+<img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png">
 <p>Mi Perfil</p>
-
 </div>
 
-<!-- CARD VER -->
 <div class="card" onclick="location.href='ver_planeaciones.html'">
-
-<img
-src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png"
-alt="Planeaciones"
->
-
+<img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png">
 <p>Ver Planeaciones</p>
-
 </div>
 
-<!-- CARD CREAR -->
 <div class="card" onclick="location.href='crear_planeacion.html'">
-
-<img
-src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png"
-alt="Crear"
->
-
+<img src="https://cdn-icons-png.flaticon.com/512/1828/1828817.png">
 <p>Crear Planeación</p>
-
 </div>
 
-<!-- CARD HORARIOS -->
 <div class="card" onclick="location.href='horarios.html'">
-
-<img
-src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
-alt="Horarios"
->
-
+<img src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
 <p>Horarios</p>
-
 </div>
 
 </div>
 
-<!-- 🔥 SCRIPT -->
+</div>
+
 <script>
 
 /* =========================================
-🔥 API
+🔥 API DINÁMICA (IMPORTANTE)
 ========================================= */
-
-const API = "http://localhost:3000";
+const API = window.location.origin;
 
 
 /* =========================================
 🔥 PROTEGER DASHBOARD
 ========================================= */
-
 const rol = localStorage.getItem("rol");
 
 if(rol !== "docente"){
-
 alert("⚠️ No tienes acceso a esta sección");
-
 window.location = "login.html";
-
 }
 
 
 /* =========================================
 🔥 USUARIO
 ========================================= */
-
-const usuario =
-JSON.parse(localStorage.getItem("usuario")) || {};
-
+const usuario = JSON.parse(localStorage.getItem("usuario")) || {};
 const userId = usuario.id || "default";
 
-const datosPerfil =
-JSON.parse(
-localStorage.getItem("perfil_" + usuario.id)
-);
+
+/* =========================================
+🔥 PERFIL
+========================================= */
+const datosPerfil = JSON.parse(localStorage.getItem("perfil_" + usuario.id));
 
 if(datosPerfil){
-
 document.getElementById("nombreDocenteSidebar").innerText =
 datosPerfil.nombre || "Docente";
-
 }
 
 
-
-const fotoGuardada =
-localStorage.getItem(
-"fotoPerfil_" + usuario.id
-);
-
-if(fotoGuardada){
-
-document.getElementById("fotoDocenteSidebar").src =
-fotoGuardada;
-
-document.getElementById("fotoUsuario").src =
-fotoGuardada;
-
-}
 /* =========================================
-🔥 CARGAR FOTO
+🔥 FOTO PERFIL
 ========================================= */
-
 function cargarFotoDashboard(){
-
-
 
 const foto = localStorage.getItem("fotoPerfil_" + userId);
 
-if(
-foto &&
-foto !== "null" &&
-foto !== "undefined"
-){
-
-// Foto arriba derecha
+if(foto && foto !== "null" && foto !== "undefined"){
 document.getElementById("fotoUsuario").src = foto;
-
-// Foto del sidebar
 document.getElementById("fotoDocenteSidebar").src = foto;
-
 }
 
 }
+
+
 /* =========================================
-🔥 CARGAR NOTIFICACIONES
+🔥 NOTIFICACIONES
 ========================================= */
-
 function cargarNotificaciones(){
 
 fetch(`${API}/notificaciones/${usuario.id}`)
-
 .then(res => res.json())
-
 .then(data => {
 
-const contador =
-document.getElementById("contador");
+const contador = document.getElementById("contador");
 
 if(contador){
-
 contador.innerText = data.length;
-
 }
 
 })
-
-.catch(error => {
-
-console.log("Error notificaciones:", error);
-
-});
+.catch(err => console.log(err));
 
 }
 
 
 /* =========================================
-🔥 CARGA INICIAL
+🔥 INICIO
 ========================================= */
-
 window.onload = function(){
-
 cargarFotoDashboard();
-
 cargarNotificaciones();
-
 };
 
 
 /* =========================================
-🔥 ACTUALIZAR FOTO AUTOMÁTICA
+🔥 STORAGE EVENT
 ========================================= */
-
 window.addEventListener("storage", function(e){
-
-if(
-e.key &&
-e.key.includes("fotoPerfil_")
-){
-
+if(e.key && e.key.includes("fotoPerfil_")){
 cargarFotoDashboard();
-
 }
-
 });
 
 
 /* =========================================
-🔥 TOGGLE MENÚ USUARIO
+🔥 MENÚ
 ========================================= */
-
 function toggleMenu(){
-
-const menu =
-document.getElementById("menuUsuario");
-
-menu.style.display =
-menu.style.display === "block"
-? "none"
-: "block";
-
+const menu = document.getElementById("menuUsuario");
+menu.style.display = menu.style.display === "block" ? "none" : "block";
 }
 
 
 /* =========================================
 🔥 VER NOTIFICACIONES
 ========================================= */
-
 function verNotificaciones(){
 
 fetch(`${API}/notificaciones/${usuario.id}`)
-
 .then(res => res.json())
-
 .then(data => {
 
 let mensajes = "";
-
 data.forEach(n => {
-
 mensajes += "• " + n.mensaje + "\n";
-
 });
 
 alert(mensajes || "Sin notificaciones");
 
-
-/* MARCAR COMO LEÍDAS */
-
 fetch(`${API}/leer-notificaciones`, {
-
 method: "POST",
-
-headers: {
-"Content-Type": "application/json"
-},
-
-body: JSON.stringify({
-id_usuario: usuario.id
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ id_usuario: usuario.id })
 })
-
-})
-
 .then(() => {
-
 document.getElementById("contador").innerText = 0;
-
 });
-
-})
-
-.catch(error => {
-
-console.log("Error:", error);
 
 });
 
@@ -414,35 +246,18 @@ console.log("Error:", error);
 /* =========================================
 🔥 CERRAR MENÚ
 ========================================= */
-
 window.addEventListener("click", function(e){
-
-if(
-
-!e.target.closest(".right-icons") &&
-!e.target.closest(".menu-usuario")
-
-){
-
-document.getElementById("menuUsuario")
-.style.display = "none";
-
+if(!e.target.closest(".right-icons") && !e.target.closest(".menu-usuario")){
+document.getElementById("menuUsuario").style.display = "none";
 }
-
 });
 
-
-
-function toggleMenuUsuario(){
-let menu = document.getElementById("menuUsuario");
-menu.style.display =
-menu.style.display === "block" ? "none" : "block";
-}
 
 function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("activo");
 }
 
 </script>
+
 </body>
 </html>

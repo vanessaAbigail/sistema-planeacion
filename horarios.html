@@ -18,19 +18,15 @@
 <img src="img/logo.jpg">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
+
 <div class="admin-info">
 <div class="admin-info-box">
 
-<img id="fotoDocenteSidebar"
-src="img/perfiles/default.png">
+<img id="fotoDocenteSidebar" src="img/perfiles/default.png">
 
-<p id="nombreDocenteSidebar">
-Docente
-</p>
+<p id="nombreDocenteSidebar">Docente</p>
 
-<span id="rolDocenteSidebar">
-Docente
-</span>
+<span id="rolDocenteSidebar">Docente</span>
 
 </div>
 </div>
@@ -51,19 +47,8 @@ Docente
 
 <h1 class="titulo">Horarios</h1>
 
-<!-- PANEL USUARIO -->
-<div class="user-panel" onclick="toggleMenu()">
-</div>
-
-<!-- MENÚ -->
-<div id="menuUsuario" class="menu-usuario">
-<a href="perfil.html">👤 Ver perfil</a>
-<a href="editar_perfil.html">✏️ Editar perfil</a>
-<a href="login.html">🚪 Cerrar sesión</a>
-</div>
-
-<!-- CONTENIDO -->
 <div class="horizontal-layout">
+
 <div class="periodo-box">
 
 <label>Periodo:</label>
@@ -76,9 +61,7 @@ onkeyup="cargarClases()"
 >
 
 <a href="agregar_clase.html">
-<button class="btn-principal">
-Agregar Clase
-</button>
+<button class="btn-principal">Agregar Clase</button>
 </a>
 
 </div>
@@ -106,80 +89,55 @@ Agregar Clase
 
 </div>
 
-
+</div>
 
 <script>
+
+const API = "http://localhost:3000";
 
 // 🔒 PROTEGER DOCENTE
 const rol = localStorage.getItem("rol");
 
 if(rol !== "docente"){
-
 alert("⚠️ No tienes acceso a esta sección");
-
 window.location = "login.html";
-
 }
 
-// 🔥 USUARIO ACTUAL
+// 🔥 USUARIO
 const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-console.log("USUARIO:", usuario);
 
 // 🔥 CARGAR HORARIOS
 function cargarClases(){
 
-fetch("http://localhost:3000/horarios/" + usuario.id)
-
+fetch(`${API}/horarios/${usuario.id}`)
 .then(res => res.json())
-
 .then(clases => {
 
-console.log("HORARIOS:", clases);
-
 let tabla = document.getElementById("tablaHorario");
-
 tabla.innerHTML = "";
 
-// 🔍 FILTRO POR PERIODO
-let periodoBuscado = document
-.getElementById("periodoInput")
-.value
-.toLowerCase()
-.trim();
+// FILTRO PERIODO
+let periodoBuscado =
+document.getElementById("periodoInput").value.toLowerCase().trim();
 
-if(periodoBuscado !== ""){
-
+if(periodoBuscado){
 clases = clases.filter(c =>
-
-(c.periodo || "")
-.toLowerCase()
-.includes(periodoBuscado)
-
+(c.periodo || "").toLowerCase().includes(periodoBuscado)
 );
-
 }
 
-// 🔥 HORAS ÚNICAS
+// HORAS ÚNICAS
 let horas = [...new Set(clases.map(c => c.hora))];
 
 if(horas.length === 0){
-
 tabla.innerHTML = `
-<tr>
-<td colspan="6">
-No hay clases registradas
-</td>
-</tr>
+<tr><td colspan="6">No hay clases registradas</td></tr>
 `;
-
 return;
-
 }
 
-// 🔥 CREAR FILAS
+// CREAR FILAS
 horas.forEach(hora => {
-
 tabla.innerHTML += `
 <tr>
 <td>${hora}</td>
@@ -190,37 +148,29 @@ tabla.innerHTML += `
 <td></td>
 </tr>
 `;
-
 });
 
-// 🔥 INSERTAR CLASES
+// INSERTAR DATOS
 let filas = document.querySelectorAll("#tablaHorario tr");
 
-clases.forEach((c) => {
-
+clases.forEach(c => {
 filas.forEach(fila => {
 
 if(fila.children[0].innerText.trim() === c.hora.trim()){
 
 let dias = {
-
 "Lunes": 1,
 "Martes": 2,
 "Miércoles": 3,
 "Miercoles": 3,
 "Jueves": 4,
 "Viernes": 5
-
 };
 
-let posicion = dias[c.dia];
+let pos = dias[c.dia];
 
-if(posicion){
-
-let celda = fila.children[posicion];
-
-celda.innerHTML = `
-
+if(pos){
+fila.children[pos].innerHTML = `
 <div style="
 background:white;
 padding:12px;
@@ -233,160 +183,94 @@ box-shadow:0 2px 6px rgba(0,0,0,.08);
 ">
 
 ${c.materia}<br>
-
 <small>${c.grupo}</small><br>
-
 <small>${c.carrera || ""}</small>
 
 <br><br>
 
-<button onclick="editar(${c.id})">
-✏️
-</button>
-
-<button onclick="eliminar(${c.id})">
-🗑️
-</button>
+<button onclick="editar(${c.id})">✏️</button>
+<button onclick="eliminar(${c.id})">🗑️</button>
 
 </div>
-
 `;
-
 }
-
 }
-
 });
-
 });
 
 })
-
-.catch(error => {
-
-console.log("ERROR:", error);
-
-});
+.catch(err => console.log("ERROR:", err));
 
 }
 
-// 🔥 ELIMINAR
+// ELIMINAR
 function eliminar(id){
 
 if(!confirm("¿Seguro que quieres eliminar?")) return;
 
-fetch("http://localhost:3000/horarios/" + id, {
-
-method: "DELETE"
-
-})
-
+fetch(`${API}/horarios/${id}`, { method: "DELETE" })
 .then(res => res.json())
-
 .then(res => {
-
 alert(res.mensaje);
-
 cargarClases();
-
 });
 
 }
 
-// 🔥 EDITAR
+// EDITAR
 function editar(id){
 
 const data = {
-
 dia: prompt("Día:"),
 hora: prompt("Hora:"),
 materia: prompt("Materia:"),
 grupo: prompt("Grupo:"),
 carrera: prompt("Carrera:")
-
 };
 
-fetch("http://localhost:3000/horarios/" + id, {
-
+fetch(`${API}/horarios/${id}`, {
 method: "PUT",
-
-headers: {
-
-"Content-Type": "application/json"
-
-},
-
+headers: { "Content-Type": "application/json" },
 body: JSON.stringify(data)
-
 })
-
 .then(res => res.json())
-
 .then(res => {
-
 alert(res.mensaje);
-
 cargarClases();
-
 });
 
 }
 
-// 🔥 MENÚ
+// MENÚ
 function toggleMenu(){
-
 let menu = document.getElementById("menuUsuario");
-
-menu.style.display =
-menu.style.display === "block"
-? "none"
-: "block";
-
+menu.style.display = menu.style.display === "block" ? "none" : "block";
 }
 
-// 🔥 CERRAR MENÚ
-window.addEventListener("click", function(e){
-
-if(!e.target.closest(".user-panel")){
-
-document.getElementById("menuUsuario").style.display = "none";
-
-}
-
-});
-
-// 🔥 CARGA INICIAL
+// INICIO
 window.onload = function(){
-
 cargarClases();
-
 };
+
+// PERFIL
 const datosPerfil =
 JSON.parse(localStorage.getItem("perfil_" + usuario.id));
 
 if(datosPerfil){
-
 document.getElementById("nombreDocenteSidebar").innerText =
 datosPerfil.nombre || "Docente";
-
 }
 
 const fotoGuardada =
 localStorage.getItem("fotoPerfil_" + usuario.id);
 
-if(
-fotoGuardada &&
-fotoGuardada !== "null" &&
-fotoGuardada !== "undefined"
-){
-
-document.getElementById("fotoDocenteSidebar").src =
-fotoGuardada;
-
+if(fotoGuardada && fotoGuardada !== "null" && fotoGuardada !== "undefined"){
+document.getElementById("fotoDocenteSidebar").src = fotoGuardada;
 }
+
 </script>
-<a href="dashboard.html" class="btn-menu">
-🏠 Menú
-</a>
+
+<a href="dashboard.html" class="btn-menu">🏠 Menú</a>
+
 </body>
 </html>

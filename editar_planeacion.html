@@ -116,10 +116,12 @@ onclick="document.getElementById('archivo').click()">
 
 // ================= FUNCIONALIDAD =================
 
+const API = window.location.origin;
+
 const id = new URLSearchParams(window.location.search).get("id");
 
 // 🔥 CARGAR
-fetch("http://localhost:3000/planeacion/"+id)
+fetch(`${API}/planeacion/${id}`)
 .then(res=>res.json())
 .then(p=>{
 document.getElementById("periodo").value = p.periodo;
@@ -157,7 +159,7 @@ if(document.getElementById("archivo").files[0]){
 formData.append("archivo", document.getElementById("archivo").files[0]);
 }
 
-fetch("http://localhost:3000/editar-planeacion/"+id,{
+fetch(`${API}/editar-planeacion/${id}`,{
 method:"POST",
 body:formData
 })

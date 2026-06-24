@@ -9,7 +9,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-
 <body class="panel-body">
 
 <!-- SIDEBAR -->
@@ -26,13 +25,9 @@
 <img id="fotoDocenteSidebar"
 src="img/perfiles/default.png">
 
-<p id="nombreDocenteSidebar">
-Docente
-</p>
+<p id="nombreDocenteSidebar">Docente</p>
 
-<span id="rolDocenteSidebar">
-Docente
-</span>
+<span id="rolDocenteSidebar">Docente</span>
 
 </div>
 </div>
@@ -53,7 +48,6 @@ Docente
 
 <h1 class="titulo">Crear Planeación</h1>
 
-<!-- FORM -->
 <div class="form-container">
 
 <form class="form-planeacion" id="formPlaneacion" enctype="multipart/form-data">
@@ -86,29 +80,20 @@ Docente
 <div class="campo">
 <label>Archivo</label>
 
-<button
-type="button"
-class="btn-archivo"
-onclick="seleccionarArchivo()">
+<button type="button" class="btn-archivo" onclick="seleccionarArchivo()">
 📄 Seleccionar
 </button>
 
-<input type="file"
-name="archivo"
-id="archivo"
-style="display:none">
+<input type="file" name="archivo" id="archivo" style="display:none">
 
 <p id="nombreArchivo"></p>
 
 </div>
 
-
 <div class="campo campo-full">
-
 <button type="submit" class="btn-guardar">
 💾 Guardar Planeación
 </button>
-
 </div>
 
 </form>
@@ -118,6 +103,8 @@ style="display:none">
 </div>
 
 <script>
+
+const API = window.location.origin;
 
 // 🔥 USUARIO
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -134,7 +121,8 @@ document.getElementById("archivo").click();
 
 document.getElementById("archivo").addEventListener("change", function(){
 if(this.files[0]){
-document.getElementById("nombreArchivo").innerText = "📄 " + this.files[0].name;
+document.getElementById("nombreArchivo").innerText =
+"📄 " + this.files[0].name;
 }
 });
 
@@ -145,53 +133,52 @@ e.preventDefault();
 const formData = new FormData(this);
 formData.append("id_usuario", usuario.id);
 
-console.log(usuario);
-console.log("ID:", usuario.id);
-
-fetch("http://localhost:3000/guardar-planeacion", {
-method:"POST",
-body:formData
+fetch(`${API}/guardar-planeacion`, {
+method: "POST",
+body: formData
 })
-.then(res=>res.text())
-.then(data=>{
-if(data==="ok"){
+.then(res => res.json())
+.then(data => {
+
+console.log("RESPUESTA BACKEND:", data);
+
+if(data.status === "ok"){
 alert("✅ Guardado correctamente");
 this.reset();
-document.getElementById("nombreArchivo").innerText="";
+document.getElementById("nombreArchivo").innerText = "";
 window.history.back();
 }else{
-alert("❌ Error");
+alert("❌ Error al guardar");
 }
-});
+
+})
+.catch(err => {
+console.log("ERROR FETCH:", err);
+alert("❌ Error de conexión");
 });
 
+});
+
+// PERFIL
 const datosPerfil =
 JSON.parse(localStorage.getItem("perfil_" + usuario.id));
 
 if(datosPerfil){
-
 document.getElementById("nombreDocenteSidebar").innerText =
 datosPerfil.nombre || "Docente";
-
 }
 
+// FOTO
 const fotoGuardada =
 localStorage.getItem("fotoPerfil_" + usuario.id);
 
-if(
-fotoGuardada &&
-fotoGuardada !== "null" &&
-fotoGuardada !== "undefined"
-){
-
-document.getElementById("fotoDocenteSidebar").src =
-fotoGuardada;
-
+if(fotoGuardada && fotoGuardada !== "null" && fotoGuardada !== "undefined"){
+document.getElementById("fotoDocenteSidebar").src = fotoGuardada;
 }
 
 </script>
-<a href="dashboard.html" class="btn-menu">
-🏠 Menú
-</a>
+
+<a href="dashboard.html" class="btn-menu">🏠 Menú</a>
+
 </body>
 </html>

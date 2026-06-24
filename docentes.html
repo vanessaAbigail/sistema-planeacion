@@ -148,6 +148,8 @@ onkeyup="filtrar()"
 const adminUser =
 JSON.parse(localStorage.getItem("usuario"));
 
+const API = window.location.origin;
+
 if(!adminUser || adminUser.tipo !== "administrador"){
 
 alert("⚠️ Acceso solo administrador");
@@ -201,7 +203,7 @@ cargarDocentes();
 
 function cargarDocentes(){
 
-fetch("http://localhost:3000/docentes")
+fetch(`${API}/docentes`)
 
 .then(res => res.json())
 

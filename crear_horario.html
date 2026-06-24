@@ -20,8 +20,11 @@
 
 <script>
 
+const API_URL = window.location.origin;
+
+
 // cargar docentes
-fetch("http://localhost:3000/docentes")
+fetch(`${API_URL}/docentes`)
 .then(res => res.json())
 .then(data => {
 
@@ -38,7 +41,7 @@ document.getElementById("docente").innerHTML = html;
 // guardar horario
 function guardar(){
 
-fetch("http://localhost:3000/guardar-horario", {
+fetch(`${API_URL}/guardar-horario`, {
 method: "POST",
 headers: { "Content-Type": "application/json" },
 body: JSON.stringify({

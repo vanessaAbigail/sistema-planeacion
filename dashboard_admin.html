@@ -151,7 +151,7 @@ document.getElementById("contadorAdmin").innerText = data.length;
 // 🔔 VER NOTIFICACIONES
 function verNotificacionesAdmin(){
 
-fetch("http://localhost:3000/notificaciones/1")
+fetch(`${API}/notificaciones/1`)
 .then(res => res.json())
 .then(data => {
 
@@ -164,7 +164,7 @@ mensajes += "• " + n.mensaje + "\n";
 alert(mensajes || "Sin notificaciones");
 
 // 🔥 LIMPIAR
-fetch("http://localhost:3000/leer-notificaciones", {
+fetch(`${API}/leer-notificaciones`,{
 method: "POST",
 headers: { "Content-Type": "application/json" },
 body: JSON.stringify({ id_usuario: 1 })

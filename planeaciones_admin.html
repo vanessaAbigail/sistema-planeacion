@@ -97,6 +97,8 @@ onkeyup="filtrarPlaneaciones()">
 
 <script>
 
+  const API_URL = window.location.origin;
+
 // ADMIN
 const adminId = "admin";
 
@@ -123,7 +125,7 @@ foto ? foto : defaultFoto;
 
 function cargarPlaneaciones(){
 
-fetch("http://localhost:3000/planeaciones")
+fetch(`${API_URL}/planeaciones`)
 
 .then(res => res.json())
 
@@ -149,20 +151,18 @@ tabla.innerHTML += `
 <td>${p.carrera}</td>
 <td>${p.materia}</td>
 <td>${p.grupo}</td>
-<td>${p.fecha}</td>
+<td>${new Date(p.fecha).toLocaleDateString()}</td>
 
 <td>
 
 ${p.archivo
-
-? `<a href="${p.archivo}" target="_blank">
-📄 Ver
-</a>`
-
+? (p.archivo.includes("drive.google.com")
+    ? `<a href="${p.archivo}" target="_blank">📄 Ver</a>`
+    : `<a href="http://localhost:3000/uploads/${p.archivo}" target="_blank">📄 Ver</a>`
+  )
 : 'Sin archivo'}
 
 </td>
-
 <td>
 
 <select onchange="cambiarEstado(${p.id}, this.value)">
@@ -242,7 +242,7 @@ contenido.includes(texto)
 
 function cambiarEstado(id, estado){
 
-fetch("http://localhost:3000/cambiar-estado/" + id, {
+fetch(`${API_URL}/cambiar-estado/${id}`, {
 
 method:"PUT",
 

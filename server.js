@@ -1,14 +1,23 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const path = require('path');
-const multer = require('multer');
-const mysql = require('mysql2');
-const cors = require('cors');
+
+const path = require("path");
+const multer = require("multer");
+const mysql = require("mysql2");
+const cors = require("cors");
 const nodemailer = require("nodemailer");
-
-
 const fs = require("fs");
+
+const BASE_URL =
+process.env.BASE_URL ||
+"http://localhost:3000";
+
+
+// 🔥 Google Drive (solo lo necesario)
+const { subirArchivoDrive, hacerPublico } = require("./drive");
 const { google } = require("googleapis");
+
+
 
 // ======================================
 // CORREO
@@ -45,10 +54,10 @@ transporter.verify(function(error, success){
 
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "planeacion",
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "planeacion",
 });
 
 
@@ -64,46 +73,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+const upload = multer({
+  dest: "uploads/"
+});
+
 // ======================================
 // GOOGLE DRIVE
 // ======================================
 
 const auth = new google.auth.GoogleAuth({
-  keyFile: "credenciales.json",
-  scopes: ["https://www.googleapis.com/auth/drive"]
+  keyFile: path.join(__dirname, "config/credenciales.json"),
+  scopes: ["https://www.googleapis.com/auth/drive"],
 });
 
-const drive = google.drive({
-  version: "v3",
-  auth
-});
+const drive = google.drive({ version: "v3", auth });
 
-const DRIVE_FOLDER_ID =
-"1dtGRnGbe92viXzM7J0-4N__Nw4NDB7O-";
-
-async function subirADrive(file) {
-
-  const response = await drive.files.create({
-    requestBody: {
-      name: file.originalname,
-      parents: [DRIVE_FOLDER_ID]
-    },
-    media: {
-      mimeType: file.mimetype,
-      body: fs.createReadStream(file.path)
-    }
-  });
-
-  await drive.permissions.create({
-    fileId: response.data.id,
-    requestBody: {
-      role: "reader",
-      type: "anyone"
-    }
-  });
-
-  return `https://drive.google.com/file/d/${response.data.id}/view`;
-}
+module.exports = { subirArchivoDrive };
 
 // ============================
 // 🔥 LOGIN
@@ -112,6 +97,9 @@ app.post("/login", (req, res) => {
 
   const { correo, password } = req.body;
 
+
+console.log("BUSCANDO:", correo);
+  
   db.query(
     "SELECT * FROM usuarios WHERE correo = ?",
     [correo],
@@ -125,7 +113,7 @@ app.post("/login", (req, res) => {
 
       const user = result[0];
 
-      if (user.password.trim() !== password.trim()) {
+     if (user.password !== password) {
         return res.json({ status: "error", mensaje: "Contraseña incorrecta" });
       }
 
@@ -141,9 +129,32 @@ app.post("/login", (req, res) => {
 
 });
 
+
+
 // ============================
-// 🔥 REGISTRO
+// 🔥 UPLOAD
 // ============================
+app.post("/upload", upload.single("archivo"), async (req, res) => {
+  try {
+    const file = req.file;
+
+    const resultado = await subirArchivoDrive(file.path, file.originalname);
+
+    const link = await hacerPublico(resultado.id);
+
+    fs.unlinkSync(file.path);
+
+    res.json({
+      mensaje: "Subido a Google Drive",
+      link: link,
+      id: resultado.id
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error al subir a Drive");
+  }
+});
 // ============================
 // 🔥 REGISTRO (CORREGIDO)
 // ============================
@@ -212,65 +223,122 @@ app.post('/registro', (req, res) => {
 // 🔥 ARCHIVOS
 // ============================
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
 });
 
-const upload = multer({ storage });
 
 // ============================
 // 🔥 PLANEACIONES
 // ============================
-app.post("/guardar-planeacion", upload.single("archivo"), (req, res) => {
+app.post("/guardar-planeacion", upload.single("archivo"), async (req, res) => {
 
-console.log("Datos recibidos:");
-console.log(req.body);
+  console.log("Datos recibidos:");
+  console.log(req.body);
 
-const { periodo, carrera, grupo, materia, fecha, id_usuario } = req.body;
+  console.log("FILE:", req.file);
 
-  db.query(`
-    INSERT INTO planeaciones
-(periodo, carrera, grupo, materia, fecha, archivo, estado, id_usuario)
-VALUES (?,?,?,?,?, ?, 'pendiente', ?)
-  `, [
-  periodo,
-  carrera,
-  grupo,
-  materia,
-  fecha,
-  req.file ? req.file.filename : null,
-  id_usuario
-], () => {
+  const { periodo, carrera, grupo, materia, fecha, id_usuario } = req.body;
 
-// 🔔 NOTIFICAR AL ADMIN
-db.query(
-  "SELECT nombre FROM usuarios WHERE id=?",
-  [id_usuario],
-  (err2, userData) => {
+  let linkDrive = null;
 
-    if(userData.length > 0){
+  try {
 
-      const nombreDocente = userData[0].nombre;
+    // ☁️ SUBIR A DRIVE
+    if (req.file) {
 
-      db.query(
-        "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
-        [
-          1, // 👈 ID DEL ADMIN
-          "📄 " + nombreDocente + " envió una nueva planeación"
-        ]
+      console.log("☁️ Subiendo archivo a Drive...");
+
+      const resultado = await subirArchivoDrive(
+        req.file.path,
+        req.file.originalname
       );
 
+      console.log("☁️ Resultado Drive:", resultado);
+
+      console.log("🔓 Haciendo público...");
+
+      linkDrive = await hacerPublico(resultado.id);
+
+      console.log("🔗 Link generado:", linkDrive);
+
+      // borrar archivo local
+      fs.unlinkSync(req.file.path);
     }
 
+    // 💾 GUARDAR EN BASE DE DATOS
+    db.query(`
+      INSERT INTO planeaciones
+      (periodo, carrera, grupo, materia, fecha, archivo, estado, id_usuario)
+      VALUES (?,?,?,?,?, ?, 'pendiente', ?)
+    `, [
+      periodo,
+      carrera,
+      grupo,
+      materia,
+      fecha,
+      linkDrive,
+      id_usuario
+    ], (err, result) => {
+
+      if (err) {
+        console.log("❌ ERROR MYSQL:", err);
+
+        return res.status(500).json({
+          status: "error",
+          mensaje: "Error al guardar en base de datos",
+          debug: err
+        });
+      }
+
+      console.log("✅ Guardado en BD correctamente");
+
+      // 🔔 NOTIFICACIÓN
+      db.query(
+        "SELECT nombre FROM usuarios WHERE id=?",
+        [id_usuario],
+        (err2, userData) => {
+
+          if (!err2 && userData.length > 0) {
+
+            const nombreDocente = userData[0].nombre;
+
+            db.query(
+              "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
+              [
+                1,
+                "📄 " + nombreDocente + " envió una nueva planeación"
+              ]
+            );
+          }
+        }
+      );
+
+      // 🔥 RESPUESTA FINAL (IMPORTANTE)
+      return res.status(200).json({
+        status: "ok",
+        mensaje: "Planeación guardada correctamente",
+        link: linkDrive || null
+      });
+
+    });
+
+  } catch (error) {
+    console.log("❌ ERROR DRIVE:", error);
+
+    return res.status(500).json({
+      status: "error",
+      mensaje: "Error en Drive",
+      debug: error.message
+    });
   }
-);
-
-
-
-    res.send("ok");
-  });
 
 });
+
 
 // 🔥 TODAS (ADMIN)
 app.get('/planeaciones', (req, res) => {
@@ -789,7 +857,8 @@ app.post("/verificar-codigo", (req, res) => {
 // 🚀 SERVIDOR
 // ============================
 // Debe quedar algo así:
-app.listen(3000, '0.0.0.0', () => {
-  console.log("Servidor corriendo");
-});
+const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});

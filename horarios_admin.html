@@ -94,6 +94,8 @@ style="padding:10px; width:250px; border-radius:8px; border:1px solid #ccc;">
 // 🔥 CARGAR DATOS ADMIN
 const adminId = "admin";
 
+const API = window.location.origin;
+
 window.onload = function(){
 
 // PERFIL
@@ -118,7 +120,7 @@ cargarHorarios();
 // 🔥 FUNCIÓN NUEVA
 function cargarHorarios(){
 
-fetch("http://localhost:3000/horarios")
+fetch(`${API}/horarios`)
 .then(res => res.json())
 .then(data => {
 

@@ -57,7 +57,7 @@ async function enviarCodigo(){
   const correo =
   document.getElementById("correo").value;
 
-  const res = await fetch("/enviar-codigo",{
+const res = await fetch(`${API}/enviar-codigo`,{
     method:"POST",
     headers:{
       "Content-Type":"application/json"
@@ -73,6 +73,8 @@ async function enviarCodigo(){
 
 }
 
+const API = window.location.origin;
+
 async function cambiarPassword(){
 
   const correo =
@@ -84,7 +86,7 @@ async function cambiarPassword(){
   const nueva =
   document.getElementById("nueva").value;
 
-  const res = await fetch("/verificar-codigo",{
+  const res = await fetch(`${API}/verificar-codigo`,{
     method:"POST",
     headers:{
       "Content-Type":"application/json"

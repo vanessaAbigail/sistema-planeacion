@@ -164,6 +164,8 @@ Grupos
 // 🔥 ADMIN ID
 const adminId = "admin";
 
+const API = window.location.origin;
+
 // 🔥 CARGAR DATOS ADMIN
 
 window.onload = function(){
@@ -223,7 +225,7 @@ document.getElementById("buscador")
 .value
 .toLowerCase();
 
-fetch("http://localhost:3000/grupos")
+fetch(`${API}/grupos`)
 
 .then(res => res.json())
 
