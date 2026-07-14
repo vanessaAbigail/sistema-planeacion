@@ -149,42 +149,40 @@ tabla.innerHTML += `
 <tr>
 
 <td>${p.periodo}</td>
+
 <td>${p.carrera}</td>
+
 <td>${p.materia}</td>
+
 <td>${p.grupo}</td>
+
 <td>${new Date(p.fecha).toLocaleDateString()}</td>
 
 <td>
 
 ${p.archivo
 ? (p.archivo.includes("drive.google.com")
-    ? `<a href="${p.archivo}" target="_blank">📄 Ver</a>`
-    : `<a href="${API_URL}/uploads/${p.archivo}" target="_blank">📄 Ver</a>`
-  )
+? `<a href="${p.archivo}" target="_blank">📄 Ver</a>`
+: `<a href="${API_URL}/uploads/${p.archivo}" target="_blank">📄 Ver</a>`)
 : 'Sin archivo'}
 
 </td>
+
 <td>
 
 <select onchange="cambiarEstado(${p.id}, this.value)">
 
-<option ${p.estado=="pendiente"?"selected":""}>
-pendiente
-</option>
+<option value="pendiente" ${p.estado=="pendiente"?"selected":""}>pendiente</option>
 
-<option ${p.estado=="aprobado"?"selected":""}>
-aprobado
-</option>
+<option value="aprobado" ${p.estado=="aprobado"?"selected":""}>aprobado</option>
 
-<option ${p.estado=="rechazado"?"selected":""}>
-rechazado
-</option>
+<option value="rechazado" ${p.estado=="rechazado"?"selected":""}>rechazado</option>
 
 </select>
 
 </td>
 
-
+<td>
 
 <button class="btnEliminar"
 onclick="eliminarPlaneacion(${p.id})">
@@ -192,6 +190,9 @@ onclick="eliminarPlaneacion(${p.id})">
 🗑 Eliminar
 
 </button>
+
+</td>
+
 </tr>
 
 `;
