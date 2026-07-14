@@ -2188,3 +2188,29 @@ outline:none;
 #buscarPlaneacion{
     margin-top: 35px; /* Baja la barra */
 }
+
+.btnEliminar{
+
+background:#e53935;
+
+color:white;
+
+border:none;
+
+padding:8px 14px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-weight:bold;
+
+transition:.3s;
+
+}
+
+.btnEliminar:hover{
+
+background:#b71c1c;
+
+}

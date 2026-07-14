@@ -99,7 +99,11 @@ PLANEACIÓN ACADÉMICA!
 
 </div>
 
+
+
 <script>
+
+const API = "https://sistema-planeacion.onrender.com";
 
 // 🔒 VALIDAR ADMIN
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -138,11 +142,11 @@ cargarNotificacionesAdmin();
 // 🔔 CARGAR NOTIFICACIONES
 function cargarNotificacionesAdmin(){
 
-fetch("http://localhost:3000/notificaciones/1")
+fetch(`${API}/notificaciones/1`)
 .then(res => res.json())
 .then(data => {
 
-document.getElementById("contadorAdmin").innerText = data.length;
+document.getElementById("contadorAdmin").innerText = data?.length || 0;
 
 });
 
@@ -203,7 +207,7 @@ document.getElementById("panelNotificaciones").style.display = "none";
 });
 
 // 🚀 INICIAR TODO
-window.onload = iniciarDashboard;
+window.addEventListener("load", iniciarDashboard);
 
 function toggleMenuUsuario(){
 let menu = document.getElementById("menuUsuario");

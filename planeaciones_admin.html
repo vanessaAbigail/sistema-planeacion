@@ -84,6 +84,7 @@ onkeyup="filtrarPlaneaciones()">
 <th>Fecha</th>
 <th>Planeación</th>
 <th>Estado</th>
+<th>Acciones</th>
 </tr>
 </thead>
 
@@ -158,7 +159,7 @@ tabla.innerHTML += `
 ${p.archivo
 ? (p.archivo.includes("drive.google.com")
     ? `<a href="${p.archivo}" target="_blank">📄 Ver</a>`
-    : `<a href="http://localhost:3000/uploads/${p.archivo}" target="_blank">📄 Ver</a>`
+    : `<a href="${API_URL}/uploads/${p.archivo}" target="_blank">📄 Ver</a>`
   )
 : 'Sin archivo'}
 
@@ -183,6 +184,14 @@ rechazado
 
 </td>
 
+
+
+<button class="btnEliminar"
+onclick="eliminarPlaneacion(${p.id})">
+
+🗑 Eliminar
+
+</button>
 </tr>
 
 `;
@@ -260,6 +269,40 @@ estado:estado
 
 .then(() => {
 alert("✅ Estado actualizado");
+});
+
+}
+
+
+function eliminarPlaneacion(id){
+
+if(!confirm("¿Está seguro de eliminar esta planeación?")){
+return;
+}
+
+fetch(`${API_URL}/eliminar-planeacion/${id}`,{
+method:"DELETE"
+})
+.then(res=>res.text())
+.then(resp=>{
+
+if(resp=="ok"){
+
+alert("✅ Planeación eliminada correctamente.");
+
+cargarPlaneaciones();
+
+}else{
+
+alert("❌ No fue posible eliminar la planeación.");
+
+}
+
+})
+.catch(()=>{
+
+alert("❌ Error al conectar con el servidor.");
+
 });
 
 }
