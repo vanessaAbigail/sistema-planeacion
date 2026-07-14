@@ -70,6 +70,8 @@ style="padding:10px; width:250px; border-radius:8px; border:1px solid #ccc;">
 <div class="tabla-box">
 
 <table class="tabla">
+
+  
 <thead>
 <tr>
 <th>Docente</th>
@@ -78,6 +80,7 @@ style="padding:10px; width:250px; border-radius:8px; border:1px solid #ccc;">
 <th>Materia</th>
 <th>Grupo</th>
 <th>Carrera</th>
+<th>Acciones</th>
 </tr>
 </thead>
 
@@ -136,12 +139,31 @@ data.forEach(h => {
 
 tabla.innerHTML += `
 <tr>
+
 <td>${h.nombre}</td>
+
 <td>${h.dia}</td>
+
 <td>${h.hora}</td>
+
 <td>${h.materia}</td>
+
 <td>${h.grupo}</td>
+
 <td>${h.carrera}</td>
+
+<td>
+
+<button
+class="btnEliminar"
+onclick="eliminarHorario(${h.id})">
+
+🗑 Eliminar
+
+</button>
+
+</td>
+
 </tr>
 `;
 
@@ -168,6 +190,45 @@ fila.style.display = nombre.includes(input) ? "" : "none";
 });
 }
 
+
+
+function eliminarHorario(id){
+
+if(!confirm("¿Está seguro de eliminar este horario?")){
+return;
+}
+
+fetch(`${API}/horarios/${id}`,{
+
+method:"DELETE"
+
+})
+
+.then(res=>res.json())
+
+.then(data=>{
+
+if(data.status=="ok"){
+
+alert("✅ Horario eliminado correctamente.");
+
+cargarHorarios();
+
+}else{
+
+alert("❌ No fue posible eliminar el horario.");
+
+}
+
+})
+
+.catch(()=>{
+
+alert("❌ Error de conexión con el servidor.");
+
+});
+
+}
 </script>
 <a href="dashboard_admin.html" class="btn-menu">
 🏠 Menú

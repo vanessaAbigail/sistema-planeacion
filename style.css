@@ -2214,3 +2214,23 @@ transition:.3s;
 background:#b71c1c;
 
 }
+
+.btnEliminar{
+
+background:#e53935;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+transition:.3s;
+
+}
+
+.btnEliminar:hover{
+
+background:#c62828;
+transform:scale(1.05);
+
+}
