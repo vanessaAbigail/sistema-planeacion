@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 
@@ -13,8 +15,10 @@ process.env.BASE_URL ||
 "http://localhost:3000";
 
 
+
+
 // 🔥 Google Drive (solo lo necesario)
-const { subirArchivoDrive, hacerPublico } = require("./drive");
+const { subirArchivoDrive, hacerPublico, oAuth2Client } = require("./drive");
 const { google } = require("googleapis");
 
 
@@ -860,6 +864,38 @@ app.post("/verificar-codigo", (req, res) => {
 
 });
 
+
+
+// ============================
+// 🔐 GOOGLE OAUTH CALLBACK
+// ============================
+
+app.get("/oauth2callback", async (req, res) => {
+
+  const code = req.query.code;
+
+  if(!code){
+    return res.send("No llegó código de Google");
+  }
+
+  try {
+
+    const { tokens } = await oAuth2Client.getToken(code);
+
+    console.log("TOKEN NUEVO:");
+    console.log(tokens.refresh_token);
+
+    res.send("Autorización correcta. Revisa la terminal.");
+
+  } catch(error){
+
+    console.log("ERROR TOKEN:", error);
+
+    res.send("Error generando token");
+
+  }
+
+});
 
 // ============================
 // 🚀 SERVIDOR

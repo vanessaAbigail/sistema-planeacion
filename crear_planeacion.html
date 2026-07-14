@@ -109,6 +109,8 @@ const API = window.location.origin;
 // 🔥 USUARIO
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
+console.log("USUARIO LOGIN:", usuario);
+
 if(!usuario || usuario.tipo !== "docente"){
 alert("Acceso solo docentes");
 window.location = "login.html";

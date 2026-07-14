@@ -15,8 +15,9 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 
 // 🔴 ESTE TOKEN LO GENERAS UNA VEZ (te explico abajo)
+
 oAuth2Client.setCredentials({
-refresh_token: "1//040AizpmX0sERCgYIARAAGAQSNwF-L9IrnVYsanSvZZFMieeHgGDTWtWCti89p13RJXhSdnmmvDPA_HvdjIcVPBoZoldXimosmQA"
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN
 });
 
 const drive = google.drive({
@@ -61,4 +62,8 @@ async function hacerPublico(fileId) {
   return `https://drive.google.com/file/d/${fileId}/view`;
 }
 
-module.exports = { subirArchivoDrive, hacerPublico };
+module.exports = { 
+  subirArchivoDrive, 
+  hacerPublico,
+  oAuth2Client
+};
