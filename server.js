@@ -29,7 +29,11 @@ const { google } = require("googleapis");
 
 const transporter = nodemailer.createTransport({
 
-  service: "gmail",
+  host: "smtp.gmail.com",
+
+  port: 587,
+
+  secure: false,
 
   auth: {
 
@@ -37,20 +41,10 @@ const transporter = nodemailer.createTransport({
 
     pass: "puuv mdrj kgba bcqn"
 
-  }
+  },
 
-});
-
-transporter.verify(function(error, success){
-
-  if(error){
-
-    console.log("❌ Error correo:", error);
-
-  }else{
-
-    console.log("✅ Correo listo para enviar");
-
+  tls: {
+    rejectUnauthorized: false
   }
 
 });
