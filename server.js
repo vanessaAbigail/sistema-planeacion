@@ -44,11 +44,13 @@ const transporter = nodemailer.createTransport({
 
   auth: {
 
-    user: "sistemawebplaneacionacademica@gmail.com",
+    auth: {
 
-    pass: "puuv mdrj kgba bcqn"
+ user: process.env.EMAIL_USER,
 
-  },
+ pass: process.env.EMAIL_PASS
+
+},
 
   tls:{
     rejectUnauthorized:false
