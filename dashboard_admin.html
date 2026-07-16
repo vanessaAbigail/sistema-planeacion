@@ -103,7 +103,7 @@ PLANEACIÓN ACADÉMICA!
 
 <script>
 
-const API = "https://sistema-planeacion.onrender.com";
+const API = window.location.origin;
 
 // 🔒 VALIDAR ADMIN
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -142,20 +142,34 @@ cargarNotificacionesAdmin();
 // 🔔 CARGAR NOTIFICACIONES
 function cargarNotificacionesAdmin(){
 
-fetch(`${API}/notificaciones/1`)
-.then(res => res.json())
-.then(data => {
+    console.log("Consultando:", `${API}/notificaciones/2`);
 
-document.getElementById("contadorAdmin").innerText = data?.length || 0;
+fetch(`${API}/notificaciones/2`)
+    .then(res => res.json())
+    .then(data => {
 
-});
+        console.log("DATA:", data);
+
+        const contador = document.getElementById("contadorAdmin");
+
+        if(!contador){
+            console.log("NO EXISTE contadorAdmin");
+            return;
+        }
+
+        contador.textContent = data.length;
+
+    })
+    .catch(err=>{
+        console.log("ERROR:", err);
+    });
 
 }
 
 // 🔔 VER NOTIFICACIONES
 function verNotificacionesAdmin(){
 
-fetch(`${API}/notificaciones/1`)
+fetch(`${API}/notificaciones/2`)
 .then(res => res.json())
 .then(data => {
 
@@ -171,7 +185,7 @@ alert(mensajes || "Sin notificaciones");
 fetch(`${API}/leer-notificaciones`,{
 method: "POST",
 headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ id_usuario: 1 })
+body: JSON.stringify({ id_usuario: 2 })
 })
 .then(() => {
   document.getElementById("contadorAdmin").innerText = 0;

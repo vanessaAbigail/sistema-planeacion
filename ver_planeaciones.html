@@ -135,6 +135,8 @@ placeholder="🔍 Buscar planeación..."
 
 <script>
 
+  const API = window.location.origin;
+
 // 🔒 PROTEGER DOCENTE
 const rol = localStorage.getItem("rol");
 
@@ -150,7 +152,7 @@ const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 // 🔥 CARGAR SOLO SUS PLANEACIONES
 function cargar(){
-fetch("http://localhost:3000/planeaciones-docente/" + usuario.id)
+fetch(`${API}/planeaciones-docente/${usuario.id}`)
 .then(res => res.json())
 .then(data => {
 
@@ -220,8 +222,8 @@ function verDocumento(archivo){
   }
 
   document.getElementById("visor").style.display = "flex";
-  document.getElementById("frameDoc").src =
-    "http://localhost:3000/uploads/" + archivo;
+document.getElementById("frameDoc").src =
+`${API}/uploads/${archivo}`;
 }
 
 function cerrarVisor(){
@@ -268,7 +270,7 @@ document
 // 🔥 ELIMINAR
 function eliminar(id){
 if(confirm("¿Eliminar planeación?")){
-fetch("http://localhost:3000/eliminar-planeacion/"+id,{method:"DELETE"})
+fetch(`${API}/eliminar-planeacion/${id}`,{method:"DELETE"})
 .then(res=>res.text())
 .then(data=>{
 if(data==="ok"){
@@ -288,7 +290,7 @@ window.location="editar_planeacion.html?id="+id;
 
 function cambiarEstado(id, estado){
 
-fetch("http://localhost:3000/estado-planeacion/" + id, {
+fetch(`${API}/estado-planeacion/${id}`, {
   method: "PUT",
   headers: {
     "Content-Type": "application/json"

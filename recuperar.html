@@ -52,6 +52,8 @@ Actualizar contraseña
 
 <script>
 
+  const API = window.location.origin;
+
 async function enviarCodigo(){
 
   const correo =
@@ -73,7 +75,6 @@ const res = await fetch(`${API}/enviar-codigo`,{
 
 }
 
-const API = window.location.origin;
 
 async function cambiarPassword(){
 

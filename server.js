@@ -33,14 +33,13 @@ const transporter = nodemailer.createTransport({
 
   auth: {
 
-    user: "abimartinez100817@gmail.com",
+    user: "sistemawebplaneacionacademica@gmail.com",
 
-    pass: "sqtv ugfb bbly nzol"
+    pass: "puuv mdrj kgba bcqn"
 
   }
 
 });
-
 
 transporter.verify(function(error, success){
 
@@ -310,26 +309,45 @@ app.post("/guardar-planeacion", upload.single("archivo"), async (req, res) => {
       console.log("✅ Guardado en BD correctamente");
 
       // 🔔 NOTIFICACIÓN
-      db.query(
-        "SELECT nombre FROM usuarios WHERE id=?",
-        [id_usuario],
-        (err2, userData) => {
+     db.query(
+  "SELECT nombre FROM usuarios WHERE id=?",
+  [id_usuario],
+  (err2, userData) => {
 
-          if (!err2 && userData.length > 0) {
+    if (err2) {
+      console.log("❌ Error buscando docente:", err2);
+      return;
+    }
 
-            const nombreDocente = userData[0].nombre;
+    if (userData.length === 0) {
+      console.log("❌ No se encontró el docente");
+      return;
+    }
 
-            db.query(
-              "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
-              [
-                1,
-                "📄 " + nombreDocente + " envió una nueva planeación"
-              ]
-            );
-          }
+    const nombreDocente = userData[0].nombre;
+
+    console.log("👨‍🏫 Docente:", nombreDocente);
+
+    db.query(
+      "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
+      [
+        2,
+        `📄 ${nombreDocente} envió una nueva planeación`
+      ],
+      (err3, result) => {
+
+        if (err3) {
+          console.log("❌ Error al guardar la notificación:", err3);
+        } else {
+          console.log("✅ Notificación guardada correctamente");
+          console.log(result);
         }
-      );
 
+      }
+    );
+
+  }
+);
       // 🔥 RESPUESTA FINAL (IMPORTANTE)
       return res.status(200).json({
         status: "ok",
@@ -363,11 +381,16 @@ app.get('/planeaciones', (req, res) => {
 app.get('/planeaciones-docente/:id', (req, res) => {
   const id = req.params.id;
 
+    console.log("ID recibido:", id);
+
   db.query(
     "SELECT * FROM planeaciones WHERE id_usuario = ?",
     [id],
     (err, result) => {
       if(err) return res.json([]);
+
+      console.log("Planeaciones encontradas:", result);
+
       res.json(result);
     }
   );
@@ -609,16 +632,24 @@ app.post('/crear-notificacion', (req, res) => {
 
 app.get('/notificaciones/:id', (req, res) => {
 
-  const id = req.params.id;
+    console.log("ENTRE A LA RUTA DE NOTIFICACIONES ");
 
-  db.query(
-    "SELECT * FROM notificaciones WHERE id_usuario=? ORDER BY fecha DESC",
-    [id],
-    (err, result) => {
-      if(err) return res.json([]);
-      res.json(result);
-    }
-  );
+    const id = req.params.id;
+
+    console.log("ID:", id);
+
+    db.query(
+        "SELECT * FROM notificaciones WHERE id_usuario = ?",
+        [id],
+        (err, result) => {
+
+            console.log("ERROR:", err);
+            console.log("RESULTADO:", result);
+
+            res.json(result);
+
+        }
+    );
 
 });
 
@@ -717,21 +748,31 @@ app.post('/leer-notificaciones', (req, res) => {
   const { id_usuario } = req.body;
 
   db.query(
-    "DELETE FROM notificaciones WHERE id_usuario=?",
+    "UPDATE notificaciones SET leida=1 WHERE id_usuario=?",
     [id_usuario],
-    () => {
-      res.json({ status: "ok" });
+    (err, result) => {
+
+      if(err){
+        console.log(err);
+        return res.status(500).json({
+          error:"Error al actualizar notificaciones"
+        });
+      }
+
+      res.json({ status:"ok" });
+
     }
   );
 
 });
 
 
-
 // ENVIAR CÓDIGO
 app.post("/enviar-codigo", (req, res) => {
 
   const { correo } = req.body;
+
+  console.log("📩 SOLICITUD DE RECUPERACIÓN PARA:", correo);
 
   const codigo =
   Math.floor(100000 + Math.random() * 900000);
@@ -749,46 +790,51 @@ app.post("/enviar-codigo", (req, res) => {
       }
 
       if(result.affectedRows === 0){
-        return res.json({
-          mensaje:"Correo no encontrado"
-        });
-      }
 
+ console.log("❌ Correo no existe:", correo);
+
+ return res.json({
+   mensaje:"Este correo no está registrado en el sistema"
+ });
+
+}
+
+console.log("ENVIANDO CODIGO A:", correo);
       transporter.sendMail({
 
-        from: "TU_CORREO@gmail.com",
+from: '"Sistema Web Integral para la Planeación Académica Docente" <sistemawebplaneacionacademica@gmail.com>',
 
-        to: correo,
+to: correo,
 
-        subject: "Recuperación de contraseña",
+subject: "Recuperación de contraseña",
 
-        html: `
-        <div style="font-family:Arial;text-align:center">
+html: `
+<h2>Recuperación de contraseña</h2>
+<p>Tu código es:</p>
+<h1>${codigo}</h1>
+`
 
-        <h2>Recuperación de contraseña</h2>
+}, (error, info) => {
 
-        <p>Tu código es:</p>
 
-        <h1 style="color:#2e7d32">
-        ${codigo}
-        </h1>
+if(error){
 
-        </div>
-        `
+console.log("❌ ERROR ENVIO:", error);
 
-      }, (error) => {
+return res.json({
+mensaje:"Error al enviar correo"
+});
 
-        if(error){
-          console.log(error);
+}
 
-          return res.json({
-            mensaje:"Error al enviar correo"
-          });
-        }
 
-        res.json({
-          mensaje:"Código enviado correctamente"
-        });
+console.log("📩 CORREO ENVIADO:", info.response);
+
+
+res.json({
+mensaje:"Código enviado correctamente"
+});
+
 
       });
 
