@@ -8,6 +8,7 @@ const multer = require("multer");
 const mysql = require("mysql2");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const fs = require("fs");
 
 const BASE_URL =
@@ -27,7 +28,7 @@ const { google } = require("googleapis");
 // CORREO
 // ======================================
 
-const dns = require("dns");
+/*const dns = require("dns");
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -54,7 +55,10 @@ const transporter = nodemailer.createTransport({
     rejectUnauthorized:false
   }
 
-});
+});*/
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
@@ -801,9 +805,9 @@ app.post("/enviar-codigo", (req, res) => {
 }
 
 console.log("ENVIANDO CODIGO A:", correo);
-      transporter.sendMail({
+      resend.emails.send({
 
-from: '"Sistema Web Integral para la Planeación Académica Docente" <sistemawebplaneacionacademica@gmail.com>',
+from: "onboarding@resend.dev",
 
 to: correo,
 
@@ -815,34 +819,31 @@ html: `
 <h1>${codigo}</h1>
 `
 
-}, (error, info) => {
+})
+.then(() => {
 
-
-if(error){
-
-console.log("❌ ERROR ENVIO:", error);
-
-return res.json({
-mensaje:"Error al enviar correo"
-});
-
-}
-
-
-console.log("📩 CORREO ENVIADO:", info.response);
-
+console.log("📩 CORREO ENVIADO CORRECTAMENTE");
 
 res.json({
 mensaje:"Código enviado correctamente"
 });
 
+})
+.catch((error)=>{
+
+console.log("❌ ERROR RESEND:", error);
+
+res.json({
+mensaje:"Error al enviar correo"
+});
+
+});
 
       });
 
     }
   );
 
-});
 
 
 // VERIFICAR CÓDIGO
