@@ -27,13 +27,18 @@ const { google } = require("googleapis");
 // CORREO
 // ======================================
 
+const dns = require("dns");
+
+dns.setDefaultResultOrder("ipv4first");
+
+
 const transporter = nodemailer.createTransport({
 
   host: "smtp.gmail.com",
 
-  port: 587,
+  port: 465,
 
-  secure: false,
+  secure: true,
 
   family: 4,
 
@@ -45,8 +50,8 @@ const transporter = nodemailer.createTransport({
 
   },
 
-  tls: {
-    rejectUnauthorized: false
+  tls:{
+    rejectUnauthorized:false
   }
 
 });
