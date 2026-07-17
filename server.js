@@ -772,79 +772,90 @@ app.post('/leer-notificaciones', (req, res) => {
 });
 
 
-// ENVIAR CÓDIGO
-app.post("/enviar-codigo", (req, res) => {
+// ============================
+// ENVIAR CÓDIGO DE RECUPERACIÓN
+// ============================
+app.post("/enviar-codigo", async (req, res) => {
 
   const { correo } = req.body;
 
   console.log("📩 SOLICITUD DE RECUPERACIÓN PARA:", correo);
 
-  const codigo =
-  Math.floor(100000 + Math.random() * 900000);
+  const codigo = Math.floor(100000 + Math.random() * 900000);
 
   db.query(
     "UPDATE usuarios SET codigo_recuperacion=? WHERE correo=?",
     [codigo, correo],
-    (err, result) => {
+    async (err, result) => {
 
-      if(err){
-        console.log(err);
+      if (err) {
+        console.log("❌ ERROR MYSQL:", err);
         return res.json({
-          mensaje:"Error servidor"
+          mensaje: "Error servidor"
         });
       }
 
-      if(result.affectedRows === 0){
+      if (result.affectedRows === 0) {
 
- console.log("❌ Correo no existe:", correo);
+        console.log("❌ Correo no existe:", correo);
 
- return res.json({
-   mensaje:"Este correo no está registrado en el sistema"
- });
+        return res.json({
+          mensaje: "Este correo no está registrado en el sistema"
+        });
 
-}
+      }
 
-console.log("ENVIANDO CODIGO A:", correo);
-      resend.emails.send({
+      console.log("📨 ENVIANDO CÓDIGO A:", correo);
+      console.log("🚀 USANDO EL NUEVO CÓDIGO RESEND");
 
-from: "onboarding@resend.dev",
+      try {
 
-to: correo,
+        const { data, error } = await resend.emails.send({
 
-subject: "Recuperación de contraseña",
+          from: "onboarding@resend.dev",
 
-html: `
-<h2>Recuperación de contraseña</h2>
-<p>Tu código es:</p>
-<h1>${codigo}</h1>
-`
+          to: correo,
 
-})
-.then(() => {
+          subject: "Recuperación de contraseña",
 
-console.log("📩 CORREO ENVIADO CORRECTAMENTE");
+          html: `
+            <h2>Recuperación de contraseña</h2>
+            <p>Tu código es:</p>
+            <h1>${codigo}</h1>
+          `
 
-res.json({
-mensaje:"Código enviado correctamente"
-});
+        });
 
-})
-.catch((error)=>{
+        console.log("📦 DATA RESEND:", data);
+        console.log("❌ ERROR RESEND:", error);
 
-console.log("❌ ERROR RESEND:", error);
+        if (error) {
 
-res.json({
-mensaje:"Error al enviar correo"
-});
+          return res.json({
+            mensaje: "Error al enviar correo"
+          });
 
-});
+        }
 
-      });
+        return res.json({
+          mensaje: "Código enviado correctamente"
+        });
+
+      } catch (error) {
+
+        console.log("❌ EXCEPCIÓN RESEND:", error);
+
+        return res.json({
+          mensaje: "Error al enviar correo"
+        });
+
+      }
 
     }
+
   );
 
-
+});
 
 // VERIFICAR CÓDIGO
 app.post("/verificar-codigo", (req, res) => {
