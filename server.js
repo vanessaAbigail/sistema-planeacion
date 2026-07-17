@@ -8,7 +8,6 @@ const multer = require("multer");
 const mysql = require("mysql2");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-const { Resend } = require("resend");
 const fs = require("fs");
 
 const BASE_URL =
@@ -28,37 +27,46 @@ const { google } = require("googleapis");
 // CORREO
 // ======================================
 
-/*const dns = require("dns");
+const dns = require("dns");
 
 dns.setDefaultResultOrder("ipv4first");
 
 
+// ======================================
+// CORREO BREVO
+// ======================================
+
 const transporter = nodemailer.createTransport({
 
-  host: "smtp.gmail.com",
+  host: "smtp-relay.brevo.com",
 
-  port: 465,
+  port: 587,
 
-  secure: true,
-
-  family: 4,
+  secure: false,
 
   auth: {
 
-    user: process.env.EMAIL_USER,
+    user: "b26402001@smtp-brevo.com",
 
-    pass: process.env.EMAIL_PASS
+    pass: process.env.BREVO_SMTP_KEY
 
-  },
-
-  tls:{
-    rejectUnauthorized:false
   }
 
-});*/
+});
 
+transporter.verify((error, success) => {
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+  if (error) {
+
+    console.log("❌ Error SMTP:", error);
+
+  } else {
+
+    console.log("✅ Brevo listo para enviar correos");
+
+  }
+
+});
 
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
@@ -786,13 +794,16 @@ app.post("/enviar-codigo", async (req, res) => {
   db.query(
     "UPDATE usuarios SET codigo_recuperacion=? WHERE correo=?",
     [codigo, correo],
-    async (err, result) => {
+    (err, result) => {
 
       if (err) {
+
         console.log("❌ ERROR MYSQL:", err);
+
         return res.json({
           mensaje: "Error servidor"
         });
+
       }
 
       if (result.affectedRows === 0) {
@@ -806,30 +817,30 @@ app.post("/enviar-codigo", async (req, res) => {
       }
 
       console.log("📨 ENVIANDO CÓDIGO A:", correo);
-      console.log("🚀 USANDO EL NUEVO CÓDIGO RESEND");
 
-      try {
+      transporter.sendMail({
 
-        const { data, error } = await resend.emails.send({
+        from: '"Sistema Web Integral para la Planeación Académica Docente" <sistemawebplaneacionacademica@gmail.com>',
 
-          from: "onboarding@resend.dev",
+        to: correo,
 
-          to: correo,
+        subject: "Recuperación de contraseña",
 
-          subject: "Recuperación de contraseña",
+        html: `
+          <h2>Recuperación de contraseña</h2>
 
-          html: `
-            <h2>Recuperación de contraseña</h2>
-            <p>Tu código es:</p>
-            <h1>${codigo}</h1>
-          `
+          <p>Tu código es:</p>
 
-        });
+          <h1>${codigo}</h1>
 
-        console.log("📦 DATA RESEND:", data);
-        console.log("❌ ERROR RESEND:", error);
+          <p>Este código es válido únicamente para recuperar tu contraseña.</p>
+        `
+
+      }, (error, info) => {
 
         if (error) {
+
+          console.log("❌ ERROR BREVO:", error);
 
           return res.json({
             mensaje: "Error al enviar correo"
@@ -837,19 +848,13 @@ app.post("/enviar-codigo", async (req, res) => {
 
         }
 
+        console.log("✅ CORREO ENVIADO:", info.response);
+
         return res.json({
           mensaje: "Código enviado correctamente"
         });
 
-      } catch (error) {
-
-        console.log("❌ EXCEPCIÓN RESEND:", error);
-
-        return res.json({
-          mensaje: "Error al enviar correo"
-        });
-
-      }
+      });
 
     }
 
