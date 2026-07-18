@@ -101,11 +101,10 @@ process.env.BREVO_API_KEY;
 new SibApiV3Sdk.SendSmtpEmail();
 
 
-    email.sender = {
-
-      email: process.env.EMAIL_FROM
-
-    };
+   email.sender = {
+      name: "Sistema Web Planeación Académica",
+      email: "sistemawebplaneacionacademica@gmail.com"
+};
 
 
     email.to = [
