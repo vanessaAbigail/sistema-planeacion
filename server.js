@@ -23,47 +23,28 @@ const { google } = require("googleapis");
 
 
 
-// ======================================
-// CORREO
-// ======================================
-
 const dns = require("dns");
 
 dns.setDefaultResultOrder("ipv4first");
-
 
 // ======================================
 // CORREO BREVO
 // ======================================
 
 const transporter = nodemailer.createTransport({
-
-  host: "smtp-relay.brevo.com",
-
-  port: 587,
-
-  secure: false,
-
+  service: "gmail",
   auth: {
-
-    user: "b26402001@smtp-brevo.com",
-
-    pass: process.env.BREVO_SMTP_KEY
-
+    user: process.env.GOOGLE_EMAIL,
+    pass: process.env.GOOGLE_APP_PASSWORD
   }
-
 });
 
 transporter.verify((error, success) => {
 
   if (error) {
-
-    console.log("❌ Error SMTP:", error);
-
+    console.log("❌ Error Gmail:", error);
   } else {
-
-    console.log("✅ Brevo listo para enviar correos");
-
+    console.log("✅ Gmail listo para enviar correos");
   }
 
 });
@@ -820,7 +801,7 @@ app.post("/enviar-codigo", async (req, res) => {
 
       transporter.sendMail({
 
-        from: '"Sistema Web Integral para la Planeación Académica Docente" <sistemawebplaneacionacademica@gmail.com>',
+        from: process.env.GOOGLE_EMAIL,
 
         to: correo,
 
@@ -840,7 +821,7 @@ app.post("/enviar-codigo", async (req, res) => {
 
         if (error) {
 
-          console.log("❌ ERROR BREVO:", error);
+          console.log("❌ ERROR GMAIL:", error);
 
           return res.json({
             mensaje: "Error al enviar correo"
