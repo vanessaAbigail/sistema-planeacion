@@ -86,15 +86,6 @@ async function enviarCorreo(destinatario, asunto, mensaje){
 
     console.log("☁️ Enviando correo con Brevo");
 
-    console.log(
-"API KEY EXISTE:",
-process.env.BREVO_API_KEY ? "SI" : "NO"
-);
-
-console.log(
-"LONGITUD KEY:",
-process.env.BREVO_API_KEY?.length
-);
 
 
      const apiInstance =
