@@ -8,6 +8,8 @@ const multer = require("multer");
 const mysql = require("mysql2");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("@getbrevo/brevo");
+
 const fs = require("fs");
 
 const BASE_URL =
@@ -51,6 +53,72 @@ transporter.verify((error, success) => {
   }
 
 });
+
+async function enviarCorreo(destinatario, asunto, mensaje) {
+
+    // Si está en Render usa Brevo
+    if (process.env.RENDER) {
+
+        console.log("☁️ Enviando correo con Brevo");
+
+        const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+        apiInstance.authentications["apiKey"].apiKey =
+            process.env.BREVO_API_KEY;
+
+
+        const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+        sendSmtpEmail.sender = {
+            email: process.env.EMAIL_FROM
+        };
+
+        sendSmtpEmail.to = [
+            {
+                email: destinatario
+            }
+        ];
+
+        sendSmtpEmail.subject = asunto;
+
+        sendSmtpEmail.htmlContent = mensaje;
+
+
+        await apiInstance.sendTransacEmail(sendSmtpEmail);
+
+
+    } else {
+
+        console.log("💻 Enviando correo con Gmail");
+
+
+        const transporter = nodemailer.createTransport({
+
+            service: "gmail",
+
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+
+        });
+
+
+        await transporter.sendMail({
+
+            from: process.env.EMAIL_USER,
+
+            to: destinatario,
+
+            subject: asunto,
+
+            html: mensaje
+
+        });
+
+    }
+
+}
 
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
@@ -802,23 +870,15 @@ app.post("/enviar-codigo", async (req, res) => {
 
       console.log("📨 ENVIANDO CÓDIGO A:", correo);
 
-      transporter.sendMail({
-
-        from: process.env.GOOGLE_EMAIL,
-
-        to: correo,
-
-        subject: "Recuperación de contraseña",
-
-        html: `
-          <h2>Recuperación de contraseña</h2>
-
-          <p>Tu código es:</p>
-
-          <h1>${codigo}</h1>
-
-          <p>Este código es válido únicamente para recuperar tu contraseña.</p>
-        `
+      await enviarCorreo(
+    correo,
+    "Código de recuperación",
+    `
+    <h2>Recuperación de contraseña</h2>
+    <p>Tu código es:</p>
+    <h1>${codigo}</h1>
+    `
+);
 
       }, (error, info) => {
 
@@ -844,7 +904,6 @@ app.post("/enviar-codigo", async (req, res) => {
 
   );
 
-});
 
 // VERIFICAR CÓDIGO
 app.post("/verificar-codigo", (req, res) => {
