@@ -87,12 +87,14 @@ async function enviarCorreo(destinatario, asunto, mensaje){
     console.log("☁️ Enviando correo con Brevo");
 
 
-    const apiInstance =
+       const apiInstance =
     new SibApiV3Sdk.TransactionalEmailsApi();
 
 
-    apiInstance.authentications["apiKey"].apiKey =
-    process.env.BREVO_API_KEY;
+    apiInstance.setApiKey(
+        SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
+        process.env.BREVO_API_KEY
+    );
 
 
 
