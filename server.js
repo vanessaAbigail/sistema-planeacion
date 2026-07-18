@@ -8,7 +8,7 @@ const multer = require("multer");
 const mysql = require("mysql2");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-const SibApiV3Sdk = require("@getbrevo/brevo");
+const brevo = require("@getbrevo/brevo");
 
 const fs = require("fs");
 
@@ -88,7 +88,7 @@ async function enviarCorreo(destinatario, asunto, mensaje){
 
 
     const apiInstance =
-    new SibApiV3Sdk.TransactionalEmailsApi();
+    new brevo.TransactionalEmailsApi();
 
 
     apiInstance.authentications["apiKey"].apiKey =
@@ -96,9 +96,8 @@ async function enviarCorreo(destinatario, asunto, mensaje){
 
 
 
-    const email =
-    new SibApiV3Sdk.SendSmtpEmail();
-
+   const email =
+new brevo.SendSmtpEmail();
 
 
     email.sender = {
