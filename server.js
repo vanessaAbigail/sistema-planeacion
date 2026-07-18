@@ -32,11 +32,14 @@ dns.setDefaultResultOrder("ipv4first");
 // ======================================
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // STARTTLS
   auth: {
     user: process.env.GOOGLE_EMAIL,
     pass: process.env.GOOGLE_APP_PASSWORD
-  }
+  },
+  family: 4
 });
 
 transporter.verify((error, success) => {
