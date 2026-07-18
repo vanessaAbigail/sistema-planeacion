@@ -30,96 +30,129 @@ const dns = require("dns");
 dns.setDefaultResultOrder("ipv4first");
 
 // ======================================
-// CORREO BREVO
+// 📧 CONFIGURACIÓN DE CORREO
 // ======================================
 
 const transporter = nodemailer.createTransport({
+
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // STARTTLS
+  secure: false,
+
   auth: {
     user: process.env.GOOGLE_EMAIL,
     pass: process.env.GOOGLE_APP_PASSWORD
   },
+
   family: 4
-});
-
-transporter.verify((error, success) => {
-
-  if (error) {
-    console.log("❌ Error Gmail:", error);
-  } else {
-    console.log("✅ Gmail listo para enviar correos");
-  }
 
 });
 
-async function enviarCorreo(destinatario, asunto, mensaje) {
 
-    // Si está en Render usa Brevo
-    if (process.env.RENDER) {
+// Verificar Gmail solamente en local
+if(!process.env.RENDER){
 
-        console.log("☁️ Enviando correo con Brevo");
+  transporter.verify((error)=>{
 
-        const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    if(error){
 
-        apiInstance.authentications["apiKey"].apiKey =
-            process.env.BREVO_API_KEY;
+      console.log("❌ Error Gmail:", error);
 
+    }else{
 
-        const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-        sendSmtpEmail.sender = {
-            email: process.env.EMAIL_FROM
-        };
-
-        sendSmtpEmail.to = [
-            {
-                email: destinatario
-            }
-        ];
-
-        sendSmtpEmail.subject = asunto;
-
-        sendSmtpEmail.htmlContent = mensaje;
-
-
-        await apiInstance.sendTransacEmail(sendSmtpEmail);
-
-
-    } else {
-
-        console.log("💻 Enviando correo con Gmail");
-
-
-        const transporter = nodemailer.createTransport({
-
-            service: "gmail",
-
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-
-        });
-
-
-        await transporter.sendMail({
-
-            from: process.env.EMAIL_USER,
-
-            to: destinatario,
-
-            subject: asunto,
-
-            html: mensaje
-
-        });
+      console.log("✅ Gmail listo para enviar correos");
 
     }
 
+  });
+
 }
 
+
+
+// ======================================
+// FUNCIÓN GENERAL DE ENVÍO
+// LOCAL = GMAIL
+// RENDER = BREVO
+// ======================================
+
+
+async function enviarCorreo(destinatario, asunto, mensaje){
+
+
+  // ☁️ RENDER
+  if(process.env.RENDER){
+
+
+    console.log("☁️ Enviando correo con Brevo");
+
+
+    const apiInstance =
+    new SibApiV3Sdk.TransactionalEmailsApi();
+
+
+    apiInstance.authentications["apiKey"].apiKey =
+    process.env.BREVO_API_KEY;
+
+
+
+    const email =
+    new SibApiV3Sdk.SendSmtpEmail();
+
+
+
+    email.sender = {
+
+      email: process.env.EMAIL_FROM
+
+    };
+
+
+    email.to = [
+
+      {
+        email: destinatario
+      }
+
+    ];
+
+
+    email.subject = asunto;
+
+
+    email.htmlContent = mensaje;
+
+
+
+    await apiInstance.sendTransacEmail(email);
+
+
+
+  }else{
+
+
+    // 💻 LOCAL
+
+    console.log("💻 Enviando correo con Gmail");
+
+
+    await transporter.sendMail({
+
+      from: process.env.GOOGLE_EMAIL,
+
+      to: destinatario,
+
+      subject: asunto,
+
+      html: mensaje
+
+    });
+
+
+  }
+
+
+}
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
@@ -835,76 +868,132 @@ app.post('/leer-notificaciones', (req, res) => {
 // ============================
 // ENVIAR CÓDIGO DE RECUPERACIÓN
 // ============================
-app.post("/enviar-codigo", async (req, res) => {
 
-  const { correo } = req.body;
+app.post("/enviar-codigo", async (req,res)=>{
 
-  console.log("📩 SOLICITUD DE RECUPERACIÓN PARA:", correo);
 
-  const codigo = Math.floor(100000 + Math.random() * 900000);
+const {correo}=req.body;
 
-  db.query(
-    "UPDATE usuarios SET codigo_recuperacion=? WHERE correo=?",
-    [codigo, correo],
-    (err, result) => {
 
-      if (err) {
-
-        console.log("❌ ERROR MYSQL:", err);
-
-        return res.json({
-          mensaje: "Error servidor"
-        });
-
-      }
-
-      if (result.affectedRows === 0) {
-
-        console.log("❌ Correo no existe:", correo);
-
-        return res.json({
-          mensaje: "Este correo no está registrado en el sistema"
-        });
-
-      }
-
-      console.log("📨 ENVIANDO CÓDIGO A:", correo);
-
-      await enviarCorreo(
-    correo,
-    "Código de recuperación",
-    `
-    <h2>Recuperación de contraseña</h2>
-    <p>Tu código es:</p>
-    <h1>${codigo}</h1>
-    `
+console.log(
+"📩 SOLICITUD DE RECUPERACIÓN PARA:",
+correo
 );
 
-      }, (error, info) => {
-
-        if (error) {
-
-          console.log("❌ ERROR GMAIL:", error);
-
-          return res.json({
-            mensaje: "Error al enviar correo"
-          });
-
-        }
-
-        console.log("✅ CORREO ENVIADO:", info.response);
-
-        return res.json({
-          mensaje: "Código enviado correctamente"
-        });
-
-      });
-
-    }
-
-  );
 
 
+const codigo =
+Math.floor(100000 + Math.random()*900000);
+
+
+
+db.query(
+
+"UPDATE usuarios SET codigo_recuperacion=? WHERE correo=?",
+
+[codigo,correo],
+
+
+async(err,result)=>{
+
+
+if(err){
+
+console.log("❌ ERROR MYSQL:",err);
+
+return res.json({
+
+mensaje:"Error servidor"
+
+});
+
+}
+
+
+
+if(result.affectedRows===0){
+
+return res.json({
+
+mensaje:"Este correo no está registrado en el sistema"
+
+});
+
+}
+
+
+
+try{
+
+
+console.log(
+"📨 ENVIANDO CÓDIGO A:",
+correo
+);
+
+
+
+await enviarCorreo(
+
+correo,
+
+"Código de recuperación",
+
+`
+
+<h2>Recuperación de contraseña</h2>
+
+<p>Tu código es:</p>
+
+<h1>${codigo}</h1>
+
+`
+
+);
+
+
+
+console.log("✅ CORREO ENVIADO");
+
+
+
+return res.json({
+
+mensaje:"Código enviado correctamente"
+
+});
+
+
+
+}catch(error){
+
+
+console.log(
+"❌ ERROR ENVÍO:",
+error
+);
+
+
+
+return res.json({
+
+mensaje:"Error al enviar correo"
+
+});
+
+
+}
+
+
+
+}
+
+
+);
+
+
+
+});
 // VERIFICAR CÓDIGO
 app.post("/verificar-codigo", (req, res) => {
 
