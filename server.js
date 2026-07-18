@@ -23,6 +23,7 @@ process.env.BASE_URL ||
 const { subirArchivoDrive, hacerPublico, oAuth2Client } = require("./drive");
 const { google } = require("googleapis");
 
+nodemailer.createTransport
 
 
 const dns = require("dns");
@@ -34,16 +35,19 @@ dns.setDefaultResultOrder("ipv4first");
 // ======================================
 
 const transporter = nodemailer.createTransport({
-
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
 
   auth: {
     user: process.env.GOOGLE_EMAIL,
     pass: process.env.GOOGLE_APP_PASSWORD
+  },
+
+  tls: {
+    family: 4
   }
-
 });
-
 
 // Verificar Gmail solamente en local
 if(!process.env.RENDER){
@@ -75,79 +79,32 @@ if(!process.env.RENDER){
 
 async function enviarCorreo(destinatario, asunto, mensaje){
 
-
-  // ☁️ RENDER
-if(false){
-
-
     console.log("☁️ Enviando correo con Brevo");
 
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
+    SibApiV3Sdk.ApiClient.instance.authentications["api-key"].apiKey =
+    process.env.BREVO_API_KEY;
 
-     const apiInstance =
-new SibApiV3Sdk.TransactionalEmailsApi();
+    const email = new SibApiV3Sdk.SendSmtpEmail();
 
+    email.sender = {
+        name: "Sistema Web Planeación Académica",
+        email: "sistemawebplaneacionacademica@gmail.com"
+    };
 
-SibApiV3Sdk.ApiClient.instance.authentications["api-key"].apiKey =
-process.env.BREVO_API_KEY;
-
-
-
-   const email =
-new SibApiV3Sdk.SendSmtpEmail();
-
-
-   email.sender = {
-      name: "Sistema Web Planeación Académica",
-      email: "sistemawebplaneacionacademica@gmail.com"
-};
-
-
-    email.to = [
-
-      {
+    email.to = [{
         email: destinatario
-      }
-
-    ];
-
+    }];
 
     email.subject = asunto;
 
-
     email.htmlContent = mensaje;
-
-
 
     await apiInstance.sendTransacEmail(email);
 
-
-
-  }else{
-
-
-    // 💻 LOCAL
-
-    console.log("💻 Enviando correo con Gmail");
-
-
-    await transporter.sendMail({
-
-      from: process.env.GOOGLE_EMAIL,
-
-      to: destinatario,
-
-      subject: asunto,
-
-      html: mensaje
-
-    });
-
-
-  }
-
-
 }
+
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
