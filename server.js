@@ -81,7 +81,7 @@ async function enviarCorreo(destinatario, asunto, mensaje){
 
 
   // ☁️ RENDER
-  if(process.env.RENDER){
+if(false){
 
 
     console.log("☁️ Enviando correo con Brevo");
