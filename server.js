@@ -423,10 +423,11 @@ app.post("/guardar-planeacion", upload.single("archivo"), async (req, res) => {
     console.log("👨‍🏫 Docente:", nombreDocente);
 
     db.query(
-      "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
-      [
-        2,
-        `📄 ${nombreDocente} envió una nueva planeación`
+  "INSERT INTO notificaciones (id_usuario, destinatario, mensaje) VALUES (?, ?, ?)",
+  [
+    2,
+    "admin",
+    `📄 ${nombreDocente} envió una nueva planeación`
       ],
       (err3, result) => {
 
@@ -574,7 +575,7 @@ app.put('/cambiar-estado/:id', (req, res) => {
 
           // 3. CREAR NOTIFICACIÓN
           db.query(
-            "INSERT INTO notificaciones (id_usuario, mensaje) VALUES (?, ?)",
+            "INSERT INTO notificaciones (id_usuario, destinatario, mensaje) VALUES (?, ?, ?)",
             [id_usuario, "Tu planeación fue " + estado],
             (err3) => {
 
