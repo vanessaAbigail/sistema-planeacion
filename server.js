@@ -34,24 +34,35 @@ dns.setDefaultResultOrder("ipv4first");
 // 📧 CONFIGURACIÓN DE CORREO
 // ======================================
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
 
-  auth: {
-    user: process.env.GOOGLE_EMAIL,
-    pass: process.env.GOOGLE_APP_PASSWORD
-  },
+let transporter = null;
 
-  tls: {
-    family: 4
-  }
-});
 
-// Verificar Gmail solamente en local
+// ======================================
+// 📧 CONFIGURAR GMAIL SOLO EN LOCAL
+// ======================================
+
 if (!process.env.BREVO_API_KEY) {
 
+  transporter = nodemailer.createTransport({
+
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+
+    auth: {
+      user: process.env.GOOGLE_EMAIL,
+      pass: process.env.GOOGLE_APP_PASSWORD
+    },
+
+    tls: {
+      family: 4
+    }
+
+  });
+
+
+  // Verificar Gmail solamente en local
   transporter.verify((error)=>{
 
     if(error){
@@ -69,7 +80,6 @@ if (!process.env.BREVO_API_KEY) {
 }
 
 
-
 // ======================================
 // FUNCIÓN GENERAL DE ENVÍO
 // LOCAL = GMAIL
@@ -79,27 +89,65 @@ if (!process.env.BREVO_API_KEY) {
 console.log("BREVO_API_KEY:", process.env.BREVO_API_KEY);
 console.log("GOOGLE_EMAIL:", process.env.GOOGLE_EMAIL);
 
-console.log("EMAIL_FROM:", process.env.EMAIL_FROM);
 
-async function enviarCorreo(destinatario, asunto, mensaje){
+async function enviarCorreo(destinatario, asunto, mensaje) {
 
-    console.log("📧 Enviando correo con Gmail...");
+    // LOCAL -> Gmail
+    if (!process.env.BREVO_API_KEY) {
 
-    await transporter.sendMail({
+        console.log("📧 Enviando correo con Gmail...");
 
-        from: `"Sistema Web Planeación Académica" <${process.env.GOOGLE_EMAIL}>`,
+        return transporter.sendMail({
+            from: `"Sistema Web Planeación Académica" <${process.env.GOOGLE_EMAIL}>`,
+            to: destinatario,
+            subject: asunto,
+            html: mensaje
+        });
 
-        to: destinatario,
+    }
 
-        subject: asunto,
+    // RENDER -> Brevo
+    console.log("☁️ Enviando correo con Brevo");
+    console.log("EMAIL_FROM:", process.env.EMAIL_FROM);
 
-        html: mensaje
+    SibApiV3Sdk.ApiClient.instance.authentications["api-key"].apiKey =
+        process.env.BREVO_API_KEY;
 
-    });
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-    console.log("✅ Correo enviado con Gmail");
+    const email = new SibApiV3Sdk.SendSmtpEmail();
 
+    email.sender = {
+        email: process.env.EMAIL_FROM,
+        name: "Sistema Web Planeación Académica"
+    };
+
+    email.to = [
+        {
+            email: destinatario
+        }
+    ];
+
+    email.replyTo = {
+        email: process.env.EMAIL_FROM,
+        name: "Sistema Web Planeación Académica"
+    };
+
+    email.subject = asunto;
+
+    email.htmlContent = `
+        <div style="font-family:Arial;padding:20px">
+            ${mensaje}
+            <hr>
+            <p style="color:#666;font-size:12px">
+                Sistema Web Planeación Académica
+            </p>
+        </div>
+    `;
+
+    return await apiInstance.sendTransacEmail(email);
 }
+
 
 // 🔥 CONEXIÓN BD
 const db = mysql.createConnection({
