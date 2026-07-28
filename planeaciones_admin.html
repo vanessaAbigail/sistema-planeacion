@@ -99,17 +99,35 @@ onkeyup="filtrarPlaneaciones()">
 
 <script>
 
-  const API_URL = window.location.origin;
+const API_URL = window.location.origin;
 
+
+// ============================
 // ADMIN
+// ============================
+
 const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario){
+
+    alert("Debe iniciar sesión");
+
+    window.location="login.html";
+
+}
+
 
 const adminId = usuario.id;
 
+
+// ============================
 // DATOS DEL ADMINISTRADOR
+// ============================
+
 const datos = JSON.parse(
     localStorage.getItem("perfil_admin_" + adminId)
 );
+
 
 if(datos){
 
@@ -118,278 +136,537 @@ if(datos){
 
 }
 
-// FOTO DEL ADMINISTRADOR
+
+
+// ============================
+// FOTO ADMINISTRADOR
+// ============================
+
 const foto = localStorage.getItem(
     "foto_admin_" + adminId
 );
 
+
 const defaultFoto = "img/perfiles/default.png";
+
 
 document.getElementById("fotoAdminSidebar").src =
 foto || defaultFoto;
 
+
 document.getElementById("fotoAdminTop").src =
 foto || defaultFoto;
 
+
+
+// ============================
 // CARGAR PLANEACIONES
+// ============================
 
 function cargarPlaneaciones(){
 
+
 fetch(`${API_URL}/planeaciones`)
+
 
 .then(res => res.json())
 
+
 .then(data => {
+
+
+console.log("PLANEACIONES ADMIN:", data);
+
+
 
 let tabla = document.getElementById("tablaPlaneaciones");
 
+
 tabla.innerHTML = "";
 
-let carreras = new Set();
-let grupos = new Set();
 
-data.forEach(p => {
 
-carreras.add(p.carrera);
-grupos.add(p.grupo);
+if(data.length === 0){
 
-tabla.innerHTML += `
+tabla.innerHTML = `
 
 <tr>
 
-<td>${p.periodo}</td>
-
-<td>${p.carrera}</td>
-
-<td>${p.materia}</td>
-
-<td>${p.grupo}</td>
-
-<td>${new Date(p.fecha).toLocaleDateString()}</td>
-
-<td>
-
-${p.archivo
-? (p.archivo.includes("drive.google.com")
-? `<a href="${p.archivo}" target="_blank">📄 Ver</a>`
-: `<a href="${API_URL}/uploads/${p.archivo}" target="_blank">📄 Ver</a>`)
-: 'Sin archivo'}
-
-</td>
-
-<td>
-
-<select onchange="cambiarEstado(${p.id}, this.value)">
-
-<option value="pendiente" ${p.estado=="pendiente"?"selected":""}>pendiente</option>
-
-<option value="aprobado" ${p.estado=="aprobado"?"selected":""}>aprobado</option>
-
-<option value="rechazado" ${p.estado=="rechazado"?"selected":""}>rechazado</option>
-
-</select>
-
-</td>
-
-<td>
-
-<div class="observacion-box">
-
-<textarea 
-class="campo-observacion"
-id="observacion-${p.id}" 
-placeholder="Escribir observación..."
->${p.observaciones || ""}</textarea>
-
-
-<button onclick="guardarObservacion(${p.id})">
-💾 Guardar
-</button>
-
-</div>
-
-
-</td>
-
-<td>
-
-<button class="btnEliminar"
-onclick="eliminarPlaneacion(${p.id})">
-
-🗑 Eliminar
-
-</button>
-
+<td colspan="9">
+No existen planeaciones registradas
 </td>
 
 </tr>
 
 `;
 
-});
-
-// SELECTS
-
-let selectCarrera = document.getElementById("carrera");
-let selectGrupo = document.getElementById("grupo");
-
-selectCarrera.innerHTML =
-'<option value="">Carrera</option>';
-
-selectGrupo.innerHTML =
-'<option value="">Grupo</option>';
-
-carreras.forEach(c => {
-selectCarrera.innerHTML += `<option>${c}</option>`;
-});
-
-grupos.forEach(g => {
-selectGrupo.innerHTML += `<option>${g}</option>`;
-});
-
-});
-
-}
-
-// FILTRAR
-
-function filtrarPlaneaciones(){
-
-let texto =
-document.getElementById("buscarPlaneacion")
-.value
-.toLowerCase();
-
-let filas =
-document.querySelectorAll("#tablaPlaneaciones tr");
-
-filas.forEach(fila => {
-
-let contenido =
-fila.innerText.toLowerCase();
-
-fila.style.display =
-contenido.includes(texto)
-? ""
-: "none";
-
-});
-
-}
-
-// CAMBIAR ESTADO
-
-function cambiarEstado(id, estado){
-
-fetch(`${API_URL}/estado-planeacion/${id}`, {
-
-method:"PUT",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-estado:estado
-})
-
-})
-
-.then(res => res.json())
-
-.then(() => {
-alert("✅ Estado actualizado");
-cargarPlaneaciones();
-});
+return;
 
 }
 
 
-function guardarObservacion(id){
+
+data.forEach(p => {
 
 
-let observacion =
-document.getElementById(`observacion-${id}`).value;
+
+tabla.innerHTML += `
+
+<tr>
 
 
-fetch(`${API_URL}/estado-planeacion/${id}`,{
-
-method:"PUT",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-estado:"rechazado",
-
-observaciones:observacion
-
-})
-
-})
+<td>
+${p.periodo || "---"}
+</td>
 
 
-.then(res=>res.json())
+<td>
+${p.carrera || "---"}
+</td>
 
-.then(data=>{
 
-alert("✅ Observación guardada");
+<td>
+${p.materia || "---"}
+</td>
 
-cargarPlaneaciones();
+
+<td>
+${p.grupo || "---"}
+</td>
+
+
+<td>
+
+${new Date(p.fecha).toLocaleDateString()}
+
+</td>
+
+
+
+<td>
+
+${
+p.archivo
+
+?
+
+(p.archivo.includes("drive.google.com")
+
+?
+
+`<a href="${p.archivo}" target="_blank">
+📄 Ver
+</a>`
+
+:
+
+`<a href="${API_URL}/uploads/${p.archivo}" target="_blank">
+📄 Ver
+</a>`
+)
+
+:
+
+"Sin archivo"
+
+}
+
+</td>
+
+
+
+
+<td>
+
+
+<select onchange="cambiarEstado(${p.id}, this.value)">
+
+
+<option value="pendiente"
+${p.estado.toLowerCase()=="pendiente"?"selected":""}>
+
+Pendiente
+
+</option>
+
+
+
+<option value="aprobado"
+${p.estado.toLowerCase()=="aprobado"?"selected":""}>
+
+Aprobado
+
+</option>
+
+
+
+<option value="rechazado"
+${p.estado.toLowerCase()=="rechazado"?"selected":""}>
+
+Rechazado
+
+</option>
+
+
+</select>
+
+
+</td>
+
+
+
+
+
+<td>
+
+
+<textarea
+
+class="campo-observacion"
+
+id="observacion-${p.id}"
+
+placeholder="Escribir observación..."
+
+>${p.observaciones || ""}</textarea>
+
+
+
+<button onclick="guardarObservacion(${p.id})">
+
+💾 Guardar
+
+</button>
+
+
+
+</td>
+
+
+
+
+<td>
+
+
+<button
+
+class="btnEliminar"
+
+onclick="eliminarPlaneacion(${p.id})">
+
+🗑 Eliminar
+
+</button>
+
+
+</td>
+
+
+
+</tr>
+
+
+`;
+
+
+});
+
 
 })
 
 
 .catch(error=>{
 
+
+console.log("ERROR PLANEACIONES:", error);
+
+
+alert("Error al cargar planeaciones");
+
+
+});
+
+
+}
+
+
+
+
+
+// ============================
+// FILTRAR
+// ============================
+
+
+function filtrarPlaneaciones(){
+
+
+let texto =
+
+document.getElementById("buscarPlaneacion")
+
+.value
+
+.toLowerCase();
+
+
+
+let filas =
+
+document.querySelectorAll("#tablaPlaneaciones tr");
+
+
+
+filas.forEach(fila=>{
+
+
+let contenido = fila.innerText.toLowerCase();
+
+
+
+fila.style.display =
+
+contenido.includes(texto)
+
+?
+
+""
+
+:
+
+"none";
+
+
+});
+
+
+}
+
+
+
+
+
+// ============================
+// CAMBIAR ESTADO
+// ============================
+
+
+function cambiarEstado(id, estado){
+
+
+fetch(`${API_URL}/estado-planeacion/${id}`,{
+
+
+method:"PUT",
+
+
+headers:{
+
+
+"Content-Type":"application/json"
+
+
+},
+
+
+body:JSON.stringify({
+
+estado:estado
+
+})
+
+
+})
+
+
+.then(res=>res.json())
+
+
+.then(()=>{
+
+
+alert("✅ Estado actualizado");
+
+
+cargarPlaneaciones();
+
+
+})
+
+
+.catch(error=>{
+
+
 console.log(error);
+
+
+});
+
+
+}
+
+
+
+
+
+// ============================
+// GUARDAR OBSERVACIÓN
+// ============================
+
+
+function guardarObservacion(id){
+
+
+let observacion =
+
+document.getElementById(`observacion-${id}`).value;
+
+
+
+fetch(`${API_URL}/estado-planeacion/${id}`,{
+
+
+method:"PUT",
+
+
+headers:{
+
+
+"Content-Type":"application/json"
+
+
+},
+
+
+body:JSON.stringify({
+
+
+estado:"rechazado",
+
+observaciones:observacion
+
+
+})
+
+
+})
+
+
+.then(res=>res.json())
+
+
+.then(()=>{
+
+
+alert("✅ Observación guardada");
+
+
+cargarPlaneaciones();
+
+
+})
+
+
+.catch(error=>{
+
+
+console.log(error);
+
 
 alert("❌ Error al guardar observación");
 
+
 });
 
 
 }
+
+
+
+
+
+
+// ============================
+// ELIMINAR
+// ============================
+
+
 function eliminarPlaneacion(id){
 
+
 if(!confirm("¿Está seguro de eliminar esta planeación?")){
+
 return;
+
 }
 
+
+
 fetch(`${API_URL}/eliminar-planeacion/${id}`,{
+
+
 method:"DELETE"
+
+
 })
+
+
 .then(res=>res.text())
+
+
 .then(resp=>{
+
 
 if(resp=="ok"){
 
-alert("✅ Planeación eliminada correctamente.");
+
+alert("✅ Planeación eliminada correctamente");
+
 
 cargarPlaneaciones();
+
 
 }else{
 
-alert("❌ No fue posible eliminar la planeación.");
+
+alert("❌ No fue posible eliminar");
+
 
 }
 
+
 })
+
+
 .catch(()=>{
 
-alert("❌ Error al conectar con el servidor.");
+
+alert("❌ Error de conexión");
+
 
 });
 
+
 }
 
+
+
+
+
+// ============================
 // INICIO
+// ============================
 
-window.onload = function(){
+
+window.onload=function(){
+
+
 cargarPlaneaciones();
+
+
 }
+
+
 
 </script>
 <a href="dashboard_admin.html" class="btn-menu">

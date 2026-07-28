@@ -421,46 +421,37 @@ linkDrive
       console.log("✅ Guardado en BD correctamente");
 
       // 🔔 NOTIFICACIÓN
-     db.query(
-  "SELECT nombre FROM usuarios WHERE id=?",
-  [id_usuario],
-  (err2, userData) => {
+db.query(
+"SELECT id FROM usuarios WHERE tipo='administrador'",
+(errAdmin, adminData)=>{
 
-    if (err2) {
-      console.log("❌ Error buscando docente:", err2);
-      return;
-    }
+if(errAdmin || adminData.length===0){
+console.log("No existe administrador");
+return;
+}
 
-    if (userData.length === 0) {
-      console.log("❌ No se encontró el docente");
-      return;
-    }
+const idAdmin = adminData[0].id;
 
-    const nombreDocente = userData[0].nombre;
 
-    console.log("👨‍🏫 Docente:", nombreDocente);
+db.query(
+"INSERT INTO notificaciones (id_usuario, destinatario, mensaje) VALUES (?, ?, ?)",
+[
+idAdmin,
+"admin",
+`📄 ${nombreDocente} envió una nueva planeación`
+],
+(err3)=>{
 
-    db.query(
-  "INSERT INTO notificaciones (id_usuario, destinatario, mensaje) VALUES (?, ?, ?)",
-  [
-    2,
-    "admin",
-    `📄 ${nombreDocente} envió una nueva planeación`
-      ],
-      (err3, result) => {
+if(err3){
+console.log("❌ Error notificación:",err3);
+}else{
+console.log("✅ Notificación guardada");
+}
 
-        if (err3) {
-          console.log("❌ Error al guardar la notificación:", err3);
-        } else {
-          console.log("✅ Notificación guardada correctamente");
-          console.log(result);
-        }
+});
 
-      }
-    );
 
-  }
-);
+});
       // 🔥 RESPUESTA FINAL (IMPORTANTE)
       return res.status(200).json({
         status: "ok",
