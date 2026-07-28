@@ -15,7 +15,7 @@
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
 
@@ -53,13 +53,53 @@ src="img/perfiles/default.png">
 <form class="form-planeacion" id="formPlaneacion" enctype="multipart/form-data">
 
 <div class="campo">
-<label>Periodo</label>
-<input type="text" name="periodo" id="periodo">
+    <label>Periodo</label>
+    <input
+        type="text"
+        name="periodo"
+        id="periodo"
+        placeholder="Ej: 2026-1">
 </div>
 
 <div class="campo">
-<label>Carrera</label>
-<input type="text" name="carrera" id="carrera">
+    <label>Carrera</label>
+
+    <select name="carrera" id="carrera" required>
+
+        <option value="">Seleccione una carrera</option>
+          <option value="Ingeniería Industrial">
+            Ingeniería Industrial
+        </option>
+
+          <option value="Ingeniería en Sistemas Computacionales">
+            Ingeniería en Sistemas Computacionales
+        </option>
+
+        <option value="Ingeniería Mecatrónica">
+            Ingeniería Mecatrónica
+        </option>
+
+        <option value="Ingeniería Civil">
+            Ingeniería Civil
+        </option>
+
+        <option value="Ingeniería Química">
+            Ingeniería Química
+        </option>
+
+        <option value="Ingeniería en Logística">
+            Ingeniería en Logística
+        </option>
+
+        <option value="Ingeniería en Tecnologías de la Información y Comunicaciones">
+            Ingeniería en Tecnologías de la Información y Comunicaciones
+        </option>
+
+        <option value="Licenciatura en Administración">
+            Licenciatura en Administración
+        </option>
+
+    </select>
 </div>
 
 <div class="campo">
@@ -73,27 +113,39 @@ src="img/perfiles/default.png">
 </div>
 
 <div class="campo">
-<label>Fecha</label>
-<input type="date" name="fecha" id="fecha">
+    <label>Fecha</label>
+    <input
+        type="date"
+        name="fecha"
+        id="fecha"
+        readonly>
 </div>
 
 <div class="campo">
-<label>Archivo</label>
+    <label>Archivo</label>
 
-<button type="button" class="btn-archivo" onclick="seleccionarArchivo()">
-📄 Seleccionar
+   <button type="button" class="btn-archivo" onclick="seleccionarArchivo()">
+    📄 Seleccionar
 </button>
 
-<input type="file" name="archivo" id="archivo" style="display:none">
+<small class="texto-pdf">
+    Solo se permiten archivos PDF.
+</small>
+
+<input
+    type="file"
+    name="archivo"
+    id="archivo"
+    accept=".pdf"
+    style="display:none">
 
 <p id="nombreArchivo"></p>
 
-</div>
-
-<div class="campo campo-full">
-<button type="submit" class="btn-guardar">
-💾 Guardar Planeación
-</button>
+<div class="campo campo-full botones-formulario">
+    <button type="submit" class="btn-guardar">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Guardar Planeación
+    </button>
 </div>
 
 </form>
@@ -106,6 +158,21 @@ src="img/perfiles/default.png">
 
 
 const API = window.location.origin;
+
+// 🔥 FECHA AUTOMÁTICA
+function colocarFechaActual() {
+
+    const hoy = new Date();
+
+    const año = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoy.getDate()).padStart(2, "0");
+
+    document.getElementById("fecha").value = `${año}-${mes}-${dia}`;
+}
+
+// Colocar la fecha al abrir la página
+colocarFechaActual();
 
 // 🔥 USUARIO
 const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -146,14 +213,23 @@ body: formData
 console.log("RESPUESTA BACKEND:", data);
 
 if(data.status === "ok"){
-alert("✅ Guardado correctamente");
-this.reset();
-document.getElementById("nombreArchivo").innerText = "";
-window.history.back();
-}else{
-alert("❌ Error al guardar");
-}
 
+    alert("✅ Planeación guardada correctamente.");
+
+    this.reset();
+
+    // 🔥 Volver a colocar la fecha automáticamente
+    colocarFechaActual();
+
+    // Limpiar el nombre del archivo
+    document.getElementById("nombreArchivo").innerText = "";
+
+    // Ir a la página de planeaciones
+    window.location.href = "ver_planeaciones.html";
+
+}else{
+    alert("❌ Error al guardar la planeación.");
+}
 })
 .catch(err => {
 console.log("ERROR FETCH:", err);

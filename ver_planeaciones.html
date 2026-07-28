@@ -14,7 +14,7 @@
 <div class="sidebar">
 
 <div class="logo-panel"> 
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
 
@@ -111,6 +111,7 @@ placeholder="🔍 Buscar planeación..."
 <th>Fecha</th>
 <th>Archivo</th>
 <th>Estado</th>
+<th>Observaciones</th>
 <th>Acciones</th>
 </tr>
 </thead>
@@ -186,6 +187,10 @@ ${p.archivo
 
 <td>
 <span>${p.estado}</span>
+</td>
+
+<td>
+${p.observaciones ? p.observaciones : "-"}
 </td>
 
 <td>
@@ -290,18 +295,46 @@ window.location="editar_planeacion.html?id="+id;
 
 function cambiarEstado(id, estado){
 
-fetch(`${API}/estado-planeacion/${id}`, {
-  method: "PUT",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ estado })
-})
-.then(res => res.json())
-.then(res => {
-  alert(res.mensaje);
-  cargar();
-});
+    let observaciones = "";
+
+    if(estado === "Rechazado"){
+
+        observaciones = prompt(
+            "Escriba el motivo del rechazo:"
+        );
+
+        if(observaciones === null){
+            return;
+        }
+
+    }
+
+    fetch(`${API}/estado-planeacion/${id}`,{
+
+        method:"PUT",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            estado,
+            observaciones
+
+        })
+
+    })
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+        alert(data.mensaje);
+
+        cargar();
+
+    });
 
 }
 

@@ -13,7 +13,7 @@
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
 
@@ -59,8 +59,37 @@ Docente
 </div>
 
 <div class="campo">
-<label>Carrera</label>
-<input type="text" id="carrera">
+    <label>Carrera</label>
+
+    <select name="carrera" id="carrera" required>
+
+        <option value="">Seleccione una carrera</option>
+
+        <option value="Ingeniería en Sistemas Computacionales">
+            Ingeniería en Sistemas Computacionales
+        </option>
+
+        <option value="Ingeniería Industrial">
+            Ingeniería Industrial
+        </option>
+
+        <option value="Ingeniería Mecatrónica">
+            Ingeniería Mecatrónica
+        </option>
+
+        <option value="Ingeniería Civil">
+            Ingeniería Civil
+        </option>
+
+        <option value="Ingeniería en Gestión Empresarial">
+            Ingeniería en Gestión Empresarial
+        </option>
+
+        <option value="Contador Público">
+            Contador Público
+        </option>
+
+    </select>
 </div>
 
 <div class="campo">
@@ -74,8 +103,12 @@ Docente
 </div>
 
 <div class="campo">
-<label>Fecha</label>
-<input type="date" id="fecha">
+    <label>Fecha</label>
+    <input
+        type="date"
+        id="fecha"
+        name="fecha"
+        readonly>
 </div>
 
 <div class="campo">
@@ -114,6 +147,15 @@ onclick="document.getElementById('archivo').click()">
 
 <script>
 
+// 🔥 FECHA AUTOMÁTICA
+const hoy = new Date();
+
+const año = hoy.getFullYear();
+const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+const dia = String(hoy.getDate()).padStart(2, "0");
+
+document.getElementById("fecha").value = `${año}-${mes}-${dia}`;
+
 // ================= FUNCIONALIDAD =================
 
 const API = window.location.origin;
@@ -128,7 +170,7 @@ document.getElementById("periodo").value = p.periodo;
 document.getElementById("carrera").value = p.carrera;
 document.getElementById("grupo").value = p.grupo;
 document.getElementById("materia").value = p.materia;
-document.getElementById("fecha").value = p.fecha;
+//document.getElementById("fecha").value = p.fecha;
 });
 
 document.getElementById("archivo").addEventListener("change", function(){

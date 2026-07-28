@@ -509,13 +509,20 @@ app.get('/planeacion/:id', (req, res) => {
   });
 });
 
+// ============================
+// ✏️ EDITAR PLANEACIÓN
+// ============================
 app.post('/editar-planeacion/:id', upload.single('archivo'), (req, res) => {
 
   const id = req.params.id;
-  const { periodo, carrera, grupo, materia, fecha, comentarios } = req.body;
+  const { periodo, carrera, grupo, materia, fecha } = req.body;
 
-  let sql = `UPDATE planeaciones SET periodo=?, carrera=?, grupo=?, materia=?, fecha=?, comentarios=?`;
-  let params = [periodo, carrera, grupo, materia, fecha, comentarios];
+  let sql = `
+    UPDATE planeaciones
+    SET periodo=?, carrera=?, grupo=?, materia=?, fecha=?
+  `;
+
+  let params = [periodo, carrera, grupo, materia, fecha];
 
   if(req.file){
     sql += ", archivo=?";
@@ -525,77 +532,16 @@ app.post('/editar-planeacion/:id', upload.single('archivo'), (req, res) => {
   sql += " WHERE id=?";
   params.push(id);
 
-  db.query(sql, params, (err, result) => {
-    if(err) return res.send("error");
-    res.send("ok");
-  });
+  db.query(sql, params, (err) => {
 
-});
-
-// ============================
-// 🔔 CAMBIAR ESTADO + NOTIFICAR
-// ============================
-app.put('/cambiar-estado/:id', (req, res) => {
-
-  const id = req.params.id;
-  const { estado } = req.body;
-
-  console.log("CAMBIANDO ESTADO:", id, estado); // 👈 DEBUG
-
-  // 1. ACTUALIZAR ESTADO
-  db.query(
-    "UPDATE planeaciones SET estado=? WHERE id=?",
-    [estado, id],
-    (err) => {
-
-      if(err){
-        console.log("ERROR UPDATE:", err);
-        return res.json({ status:"error" });
-      }
-
-      // 2. OBTENER ID DEL DOCENTE
-      db.query(
-        "SELECT id_usuario FROM planeaciones WHERE id=?",
-        [id],
-        (err2, data) => {
-
-          if(err2){
-            console.log("ERROR SELECT:", err2);
-            return res.json({ status:"error" });
-          }
-
-          if(data.length === 0){
-            console.log("NO ENCONTRÓ USUARIO");
-            return res.json({ status:"error" });
-          }
-
-          const id_usuario = data[0].id_usuario;
-
-          console.log("ID DOCENTE:", id_usuario); // 👈 DEBUG
-
-          // 3. CREAR NOTIFICACIÓN
-          db.query(
-            "INSERT INTO notificaciones (id_usuario, destinatario, mensaje) VALUES (?, ?, ?)",
-            [id_usuario, "Tu planeación fue " + estado],
-            (err3) => {
-
-              if(err3){
-                console.log("ERROR INSERT:", err3);
-                return res.json({ status:"error" });
-              }
-
-              console.log("NOTIFICACIÓN CREADA"); // 👈 DEBUG
-
-              res.json({ status:"ok" });
-
-            }
-          );
-
-        }
-      );
-
+    if(err){
+      console.log(err);
+      return res.send("error");
     }
-  );
+
+    res.send("ok");
+
+  });
 
 });
 
@@ -733,10 +679,10 @@ app.get('/notificaciones/:id', (req, res) => {
 
     console.log("ID:", id);
 
-    db.query(
-        "SELECT * FROM notificaciones WHERE id_usuario = ?",
-        [id],
-        (err, result) => {
+   db.query(
+    "SELECT * FROM notificaciones WHERE id_usuario = ? AND leida = 0 ORDER BY fecha DESC",
+    [id],
+    (err, result) => {
 
             console.log("ERROR:", err);
             console.log("RESULTADO:", result);
@@ -818,20 +764,67 @@ res.json(result);
 // 🔥 APROBAR / RECHAZAR PLANEACION
 app.put("/estado-planeacion/:id", (req, res) => {
 
-  const id = req.params.id;
-  const { estado } = req.body;
+    const id = req.params.id;
+    const { estado, observaciones } = req.body;
 
-  db.query(
-    "UPDATE planeaciones SET estado=? WHERE id=?",
-    [estado, id],
-    (err, result) => {
+    db.query(
+        `
+        UPDATE planeaciones
+        SET estado = ?, observaciones = ?
+        WHERE id = ?
+        `,
+        [estado, observaciones || "", id],
+        (err) => {
 
-      if(err) return res.json({ mensaje: "Error" });
+            if (err) {
+                console.log(err);
+                return res.json({
+                    mensaje: "Error"
+                });
+            }
 
-      res.json({ mensaje: "Estado actualizado" });
+            // 🔥 Buscar el docente dueño de la planeación
+            db.query(
+                "SELECT id_usuario FROM planeaciones WHERE id=?",
+                [id],
+                (err2, result) => {
 
-    }
-  );
+                    if (err2 || result.length === 0) {
+                        console.log(err2);
+                        return res.json({
+                            mensaje: "Estado actualizado"
+                        });
+                    }
+
+                    const idDocente = result[0].id_usuario;
+
+                    // 🔔 Crear notificación para el docente
+                    db.query(
+                        `INSERT INTO notificaciones
+                        (id_usuario, destinatario, mensaje)
+                        VALUES (?, 'docente', ?)`,
+                        [
+                            idDocente,
+                            `📄 Tu planeación fue ${estado}.`
+                        ],
+                        (err3) => {
+
+                            if (err3) {
+                                console.log("Error creando notificación:", err3);
+                            }
+
+                            res.json({
+                                mensaje: "Estado actualizado correctamente"
+                            });
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
 
 });
 

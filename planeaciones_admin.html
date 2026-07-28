@@ -18,7 +18,7 @@
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
 
@@ -84,6 +84,7 @@ onkeyup="filtrarPlaneaciones()">
 <th>Fecha</th>
 <th>Planeación</th>
 <th>Estado</th>
+<th>Observación</th>
 <th>Acciones</th>
 </tr>
 </thead>
@@ -184,6 +185,26 @@ ${p.archivo
 
 <td>
 
+<div class="observacion-box">
+
+<textarea 
+class="campo-observacion"
+id="observacion-${p.id}" 
+placeholder="Escribir observación..."
+>${p.observaciones || ""}</textarea>
+
+
+<button onclick="guardarObservacion(${p.id})">
+💾 Guardar
+</button>
+
+</div>
+
+
+</td>
+
+<td>
+
 <button class="btnEliminar"
 onclick="eliminarPlaneacion(${p.id})">
 
@@ -252,7 +273,7 @@ contenido.includes(texto)
 
 function cambiarEstado(id, estado){
 
-fetch(`${API_URL}/cambiar-estado/${id}`, {
+fetch(`${API_URL}/estado-planeacion/${id}`, {
 
 method:"PUT",
 
@@ -270,11 +291,59 @@ estado:estado
 
 .then(() => {
 alert("✅ Estado actualizado");
+cargarPlaneaciones();
 });
 
 }
 
 
+function guardarObservacion(id){
+
+
+let observacion =
+document.getElementById(`observacion-${id}`).value;
+
+
+fetch(`${API_URL}/estado-planeacion/${id}`,{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+estado:"rechazado",
+
+observaciones:observacion
+
+})
+
+})
+
+
+.then(res=>res.json())
+
+.then(data=>{
+
+alert("✅ Observación guardada");
+
+cargarPlaneaciones();
+
+})
+
+
+.catch(error=>{
+
+console.log(error);
+
+alert("❌ Error al guardar observación");
+
+});
+
+
+}
 function eliminarPlaneacion(id){
 
 if(!confirm("¿Está seguro de eliminar esta planeación?")){

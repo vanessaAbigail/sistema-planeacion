@@ -12,23 +12,28 @@ align-items:center;
 background-image:url("img/fondo.jpg");
 background-size:cover;
 background-position:center;
+
+}
+
+.login-fondo{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+    border-radius:20px 20px 0 0;
+    display:block;
+    margin:-30px -30px 20px -30px;
 }
 
 .login-box{
-width:400px;
-padding:30px;
-text-align:center;
-
-background:rgba(255,255,255,0.85);
-backdrop-filter:blur(15px);
-
-border-radius:25px;
-
-box-shadow:
-0 15px 35px rgba(0,0,0,.20);
-
-animation: aparecer .6s ease;
+    width:500px;
+    background:rgba(255,255,255,.9);
+    border-radius:20px;
+    overflow:hidden;
+    text-align:center;
+    padding:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,.2);
 }
+
 
 @keyframes aparecer{
 from{
@@ -2232,5 +2237,510 @@ transition:.3s;
 
 background:#c62828;
 transform:scale(1.05);
+
+}
+
+.texto-pdf{
+    display:block;
+    margin-top:8px;
+    margin-bottom:10px;
+    font-size:12px;
+    color:#666;
+    font-style:italic;
+}
+/* guardar crear planeacion */
+
+.btn-guardar{
+
+    width:280px;
+    height:55px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+
+    margin:25px auto 0;
+
+    background:#149b1d;
+    color:white;
+
+    border:none;
+    border-radius:15px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:all .3s ease;
+
+    box-shadow:0 8px 18px rgba(20,155,29,.25);
+
+}
+
+
+.btn-guardar:hover{
+
+    background:#118418;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 12px 22px rgba(20,155,29,.35);
+
+}
+
+.btn-guardar:active{
+
+    transform:scale(.98);
+
+}
+
+
+.logo-panel{
+    text-align:center;
+    margin-top:20px;      /* Baja el logo */
+    margin-bottom:20px;
+}
+
+.logo-panel img{
+    width:200px;
+    height:auto;
+    display:block;
+    margin:0 auto 10px auto;
+}
+
+
+/* ===========================
+   OBSERVACIONES ADMINISTRADOR
+=========================== */
+
+
+.tabla th,
+.tabla td{
+    padding: 9px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* columna observación */
+
+.tabla textarea{
+
+    width: 210px;
+    min-height: 80px;
+
+    padding: 10px;
+
+    border-radius: 10px;
+
+    border: 1px solid #ccc;
+
+    resize: vertical;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+}
+
+
+/* cuando escriba */
+
+.tabla textarea:focus{
+
+    outline: none;
+
+    border-color: #2e7d32;
+
+    box-shadow: 0 0 5px rgba(46,125,50,.3);
+
+}
+
+
+
+/* botón guardar observación */
+
+.tabla button:not(.btnEliminar){
+
+    margin-top: 10px;
+
+    padding: 8px 15px;
+
+    border:none;
+
+    border-radius: 8px;
+
+    background:#2e7d32;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+}
+
+
+.tabla button:not(.btnEliminar):hover{
+
+    background:#1b5e20;
+
+}
+
+
+/* ancho de columnas */
+
+.tabla th:nth-child(7){
+
+    width:100px;
+
+}
+
+
+.tabla th:nth-child(8){
+
+    width:280px;
+
+}
+
+
+.tabla th:nth-child(9){
+
+    width:150px;
+
+}
+
+
+/* select estado */
+
+.tabla select{
+
+    padding:8px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+}
+
+/* =====================================
+   TABLA PLANEACIONES ADMINISTRADOR
+===================================== */
+
+
+.tabla-box{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:20px;
+
+    margin-top:20px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+
+    overflow-x:auto;
+
+}
+
+
+/* TABLA GENERAL */
+
+.tabla{
+
+    width:100%;
+
+    border-collapse:separate;
+
+    border-spacing:0;
+
+    table-layout:fixed;
+
+}
+
+
+/* ENCABEZADO */
+
+.tabla thead th{
+
+    background:#2e7d32;
+
+    color:white;
+
+    padding:15px 10px;
+
+    font-size:14px;
+
+    text-align:center;
+
+    white-space:nowrap;
+
+}
+
+
+/* BORDES REDONDEADOS DEL ENCABEZADO */
+
+.tabla thead th:first-child{
+
+    border-top-left-radius:10px;
+
+}
+
+
+.tabla thead th:last-child{
+
+    border-top-right-radius:10px;
+
+}
+
+
+/* CELDAS */
+
+.tabla tbody td{
+
+    padding:14px 10px;
+
+    text-align:center;
+
+    vertical-align:middle;
+
+    font-size:14px;
+
+    border-bottom:1px solid #ddd;
+
+    word-wrap:break-word;
+
+}
+
+
+/* FILAS */
+
+.tabla tbody tr:hover{
+
+    background:#f1f8f1;
+
+}
+
+
+/* SELECT ESTADO */
+
+.tabla select{
+
+    width:120px;
+
+    padding:8px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+    cursor:pointer;
+
+}
+
+
+/* OBSERVACIÓN */
+
+.tabla textarea{
+
+    width:220px;
+
+    height:80px;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    border:1px solid #ccc;
+
+    resize:none;
+
+    font-size:13px;
+
+}
+
+
+.tabla textarea:focus{
+
+    outline:none;
+
+    border-color:#2e7d32;
+
+}
+
+
+/* BOTÓN GUARDAR OBSERVACIÓN */
+
+.tabla td button:not(.btnEliminar){
+
+    margin-top:8px;
+
+    padding:8px 14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#4CAF50;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+
+.tabla td button:not(.btnEliminar):hover{
+
+    background:#2e7d32;
+
+}
+
+
+/* BOTÓN ELIMINAR */
+
+.btnEliminar{
+
+    padding:9px 14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#c62828;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+
+.btnEliminar:hover{
+
+    background:#8e0000;
+
+}
+
+
+/* TAMAÑO DE COLUMNAS */
+
+.tabla th:nth-child(1),
+.tabla td:nth-child(1){
+
+    width:80px;
+
+}
+
+
+.tabla th:nth-child(2),
+.tabla td:nth-child(2){
+
+    width:160px;
+
+}
+
+
+.tabla th:nth-child(3),
+.tabla td:nth-child(3){
+
+    width:150px;
+
+}
+
+
+.tabla th:nth-child(4),
+.tabla td:nth-child(4){
+
+    width:80px;
+
+}
+
+
+.tabla th:nth-child(5),
+.tabla td:nth-child(5){
+
+    width:110px;
+
+}
+
+
+.tabla th:nth-child(6),
+.tabla td:nth-child(6){
+
+    width:100px;
+
+}
+
+
+.tabla th:nth-child(7),
+.tabla td:nth-child(7){
+
+    width:130px;
+
+}
+
+
+.tabla th:nth-child(8),
+.tabla td:nth-child(8){
+
+    width:260px;
+
+}
+
+
+.tabla th:nth-child(9),
+.tabla td:nth-child(9){
+
+    width:120px;
+
+}
+
+
+
+/* ============================
+   AJUSTE LOGIN
+   LOGO DENTRO DEL RECUADRO
+============================ */
+
+
+.login-box{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:35px;
+
+}
+
+
+/* Logo institucional */
+
+.login-box .logo{
+
+    width:250px;
+
+    height:130px;
+
+    object-fit:contain;
+
+    margin-bottom:15px;
+
+}
+
+
+/* Título */
+
+.login-box h2{
+
+    margin-top:0;
+
+    margin-bottom:25px;
 
 }

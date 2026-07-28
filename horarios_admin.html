@@ -23,7 +23,7 @@ if(!usuario || usuario.tipo !== "administrador"){
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN<br>ACADÉMICA</h3>
 </div>
 
@@ -94,26 +94,25 @@ style="padding:10px; width:250px; border-radius:8px; border:1px solid #ccc;">
 
 <script>
 
-// 🔥 CARGAR DATOS ADMIN
-const adminId = "admin";
 
 const API = window.location.origin;
 
 window.onload = function(){
 
 // PERFIL
-const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+const datos = JSON.parse(localStorage.getItem("perfil_admin_admin"));
 
 if(datos){
 document.getElementById("nombreAdmin").innerText = datos.nombre || "Administrador";
 }
 
-// FOTO
-const foto = localStorage.getItem("foto_admin_" + adminId);
+// FOTO ADMINISTRADOR
+const foto = localStorage.getItem("foto_admin_admin");
 
-if(foto){
-document.getElementById("fotoAdminSidebar").src = foto;
-}
+const defaultFoto = "img/perfiles/default.png";
+
+document.getElementById("fotoAdminSidebar").src =
+foto ? foto : defaultFoto;
 
 // 🔥 CARGAR HORARIOS
 cargarHorarios();

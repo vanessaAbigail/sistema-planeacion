@@ -12,7 +12,7 @@
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
 
@@ -84,39 +84,76 @@
 
 const API = window.location.origin;
 
-const adminId = "admin";
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+const adminId = usuario.id;
+
 
 // 🔥 CARGAR DATOS
+
 window.onload = function(){
 
-const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+const datos = JSON.parse(
+localStorage.getItem("perfil_admin_admin")
+);
+
 
 if(datos){
+
 document.getElementById("datosPerfil").innerHTML = `
+
 <p><b>Administrador:</b> ${datos.nombre}</p>
+
 <p><b>Correo:</b> ${datos.correo}</p>
+
 <p><b>Teléfono:</b> ${datos.telefono}</p>
+
 <p><b>Área:</b> ${datos.area || '---'}</p>
+
 <p><b>ID:</b> ${datos.matricula || '---'}</p>
+
 <p><b>Rol:</b> ${datos.rol || 'Administrador'}</p>
+
 `;
+
 }
 
-// 🔥 FOTO
-const foto = localStorage.getItem("foto_admin_" + adminId);
+
+
+// 🔥 FOTO ADMINISTRADOR
+
+const foto = localStorage.getItem(
+"foto_admin_admin"
+);
+
 
 if(foto){
+
 document.getElementById("fotoPerfil").src = foto;
+
 document.getElementById("fotoUsuario").src = foto;
-}
 
 }
 
-// 🔥 MENÚ
+
+}
+
+
+
+// 🔥 MENÚ USUARIO
+
 function toggleMenu(){
+
 let menu = document.getElementById("menuUsuario");
-menu.style.display = menu.style.display === "block" ? "none" : "block";
+
+menu.style.display = 
+menu.style.display === "block" 
+? "none" 
+: "block";
+
 }
+
 
 </script>
 

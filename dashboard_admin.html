@@ -12,7 +12,7 @@
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN<br>ACADÉMICA</h3>
 </div>
 
@@ -113,7 +113,7 @@ alert("Acceso solo administrador");
 window.location = "login.html";
 }
 
-const adminId = "admin";
+const adminId = usuario.id;
 
 // 🔥 FUNCIÓN PRINCIPAL (TODO EN UNA)
 function iniciarDashboard(){
@@ -128,6 +128,8 @@ document.getElementById("rolAdmin").innerText = "Administrador";
 
 // 🔥 FOTO
 const foto = localStorage.getItem("foto_admin_" + adminId);
+
+console.log("FOTO ADMIN:", foto);
 
 if(foto){
 document.getElementById("fotoAdmin").src = foto;
@@ -144,7 +146,7 @@ function cargarNotificacionesAdmin(){
 
     console.log("Consultando:", `${API}/notificaciones/2`);
 
-fetch(`${API}/notificaciones/2`)
+fetch(`${API}/notificaciones/${adminId}`)
     .then(res => res.json())
     .then(data => {
 
@@ -169,7 +171,7 @@ fetch(`${API}/notificaciones/2`)
 // 🔔 VER NOTIFICACIONES
 function verNotificacionesAdmin(){
 
-fetch(`${API}/notificaciones/2`)
+fetch(`${API}/notificaciones/${adminId}`)
 .then(res => res.json())
 .then(data => {
 
@@ -185,7 +187,7 @@ alert(mensajes || "Sin notificaciones");
 fetch(`${API}/leer-notificaciones`,{
 method: "POST",
 headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ id_usuario: 2 })
+body: JSON.stringify({ id_usuario: adminId })
 })
 .then(() => {
   document.getElementById("contadorAdmin").innerText = 0;
@@ -201,9 +203,15 @@ cargarNotificacionesAdmin();
 }, 5000);
 
 // 🔥 MENÚ
-function toggleMenu(){
+function toggleMenuUsuario(){
+
 let menu = document.getElementById("menuUsuario");
-menu.style.display = menu.style.display === "block" ? "none" : "block";
+
+menu.style.display =
+menu.style.display === "block"
+? "none"
+: "block";
+
 }
 
 // 🔥 CERRAR SESIÓN
@@ -223,19 +231,18 @@ document.getElementById("panelNotificaciones").style.display = "none";
 // 🚀 INICIAR TODO
 window.addEventListener("load", iniciarDashboard);
 
-function toggleMenuUsuario(){
-let menu = document.getElementById("menuUsuario");
-menu.style.display =
-menu.style.display === "block" ? "none" : "block";
+
+// ☰ ABRIR SIDEBAR
+function abrirSidebar(){
+
+document.querySelector(".sidebar").classList.toggle("activo");
+
 }
 
-function toggleMenu(){
-document.querySelector(".sidebar").classList.toggle("activo");
-}
 
 </script>
 
-<button class="menu-toggle" onclick="toggleMenu()">
+<button class="menu-toggle" onclick="abrirSidebar()">
 ☰
 </button>
 </body>

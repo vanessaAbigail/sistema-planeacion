@@ -14,7 +14,7 @@
 <div class="sidebar">
 
 <div class="logo-panel">
-<img src="img/logo.jpg">
+<img src="img/tesji.png">
 <h3>SISTEMA DE PLANEACIÓN ACADÉMICA</h3>
 </div>
 
@@ -89,79 +89,170 @@ Cambiar Foto
 
 const adminId = "admin";
 
-// 🔥 FOTO
+
+// ============================
+// CAMBIAR FOTO
+// ============================
+
 document.getElementById("inputFoto").addEventListener("change", function(e){
 
 const file = e.target.files[0];
 
 if(file){
+
 const reader = new FileReader();
 
 reader.onload = function(e){
 
-localStorage.setItem("foto_admin_" + adminId, e.target.result);
-localStorage.setItem("perfil_admin_" + adminId, JSON.stringify(datos));
+const imagen = e.target.result;
 
-document.getElementById("preview").src = e.target.result;
-document.getElementById("fotoUsuario").src = e.target.result;
+
+// GUARDAR FOTO ADMINISTRADOR
+
+localStorage.setItem(
+"foto_admin_admin",
+imagen
+);
+
+
+// ACTUALIZAR IMÁGENES
+
+document.getElementById("preview").src = imagen;
+
+document.getElementById("fotoUsuario").src = imagen;
+
 
 };
 
+
 reader.readAsDataURL(file);
+
 }
 
 });
 
-// 🔥 GUARDAR PERFIL COMPLETO
+
+
+// ============================
+// GUARDAR PERFIL
+// ============================
+
 function guardarAdmin(e){
 
 e.preventDefault();
 
+
 const datos = {
-nombre: nombre.value,
-correo: correo.value,
-telefono: telefono.value,
-area: area.value,
-matricula: matricula.value,
-rol: rol.value,
+
+nombre: document.getElementById("nombre").value,
+
+correo: document.getElementById("correo").value,
+
+telefono: document.getElementById("telefono").value,
+
+area: document.getElementById("area").value,
+
+matricula: document.getElementById("matricula").value,
+
+rol: document.getElementById("rol").value
+
 };
 
-localStorage.setItem("perfil_admin_" + adminId, JSON.stringify(datos));
+
+// GUARDAR PERFIL ADMIN
+
+localStorage.setItem(
+"perfil_admin_admin",
+JSON.stringify(datos)
+);
+
+
 
 alert("Perfil actualizado correctamente ✅");
 
+
 window.location = "perfil_admin.html";
+
+
 }
 
-// 🔥 CARGAR DATOS
+
+
+// ============================
+// CARGAR DATOS
+// ============================
+
 window.onload = function(){
 
-const datos = JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+
+
+const datos = JSON.parse(
+localStorage.getItem("perfil_admin_admin")
+);
+
+
 
 if(datos){
+
+
 nombre.value = datos.nombre || "";
+
 correo.value = datos.correo || "";
+
 telefono.value = datos.telefono || "";
+
 area.value = datos.area || "";
+
 matricula.value = datos.matricula || "";
+
 rol.value = datos.rol || "Administrador";
+
+
 }
 
-// FOTO
-const foto = localStorage.getItem("foto_admin_" + adminId);
+
+
+
+// CARGAR FOTO
+
+const foto = localStorage.getItem(
+"foto_admin_admin"
+);
+
+
 
 if(foto){
-document.getElementById("preview").src = foto;
-document.getElementById("fotoUsuario").src = foto;
-}
+
+
+preview.src = foto;
+
+fotoUsuario.src = foto;
+
 
 }
 
-// MENÚ
+
+}
+
+
+
+// ============================
+// MENU USUARIO
+// ============================
+
 function toggleMenu(){
+
 let menu = document.getElementById("menuUsuario");
-menu.style.display = menu.style.display === "block" ? "none" : "block";
+
+
+menu.style.display = 
+menu.style.display === "block" 
+? "none" 
+: "block";
+
+
 }
+
 
 </script>
 <a href="dashboard_admin.html" class="btn-menu">
