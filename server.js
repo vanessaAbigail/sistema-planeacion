@@ -345,9 +345,19 @@ app.post("/guardar-planeacion", upload.single("archivo"), async (req, res) => {
   console.log("Datos recibidos:");
   console.log(req.body);
 
+console.log("MATERIA:", req.body.materia);
+console.log("GRUPO:", req.body.grupo);
+
   console.log("FILE:", req.file);
 
-  const { periodo, carrera, grupo, materia, fecha, id_usuario } = req.body;
+ const { 
+    periodo, 
+    carrera, 
+    grupo,
+    materia,
+    fecha, 
+    id_usuario 
+} = req.body;
 
   let linkDrive = null;
 
@@ -377,18 +387,26 @@ app.post("/guardar-planeacion", upload.single("archivo"), async (req, res) => {
 
     // 💾 GUARDAR EN BASE DE DATOS
     db.query(`
-      INSERT INTO planeaciones
-      (periodo, carrera, grupo, materia, fecha, archivo, estado, id_usuario)
-      VALUES (?,?,?,?,?, ?, 'pendiente', ?)
+     INSERT INTO planeaciones
+(
+periodo,
+carrera,
+grupo,
+materia,
+fecha,
+id_usuario,
+archivo
+)
+VALUES (?,?,?,?,?,?,?)
     `, [
-      periodo,
-      carrera,
-      grupo,
-      materia,
-      fecha,
-      linkDrive,
-      id_usuario
-    ], (err, result) => {
+periodo,
+carrera,
+grupo,
+materia,
+fecha,
+id_usuario,
+linkDrive
+], (err, result) => {
 
       if (err) {
         console.log("❌ ERROR MYSQL:", err);
