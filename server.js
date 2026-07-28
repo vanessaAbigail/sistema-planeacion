@@ -681,36 +681,46 @@ app.post('/crear-notificacion', (req, res) => {
 });
 
 
-
-// 🔔 NOTIFICACIONES ADMIN
-app.get('/notificaciones/:id', (req,res)=>{
+// 🔔 NOTIFICACIONES
+app.get('/notificaciones/:id', (req, res) => {
 
     const id = req.params.id;
 
-    console.log("CONSULTANDO NOTIFICACIONES ADMIN:", id);
+    console.log("CONSULTANDO NOTIFICACIONES PARA:", id);
+
 
     db.query(
-    `
-    SELECT * 
-    FROM notificaciones
-    WHERE destinatario = 'admin'
-    AND leida = 0
-    ORDER BY fecha DESC
-    `,
-    (err,result)=>{
+        `
+        SELECT *
+        FROM notificaciones
+        WHERE 
+        (destinatario = 'admin' AND ? = 1)
+        OR
+        (destinatario = 'docente' AND id_usuario = ?)
+        AND leida = 0
+        ORDER BY fecha DESC
+        `,
+        [id, id],
+        (err, result) => {
 
-        if(err){
-            console.log("ERROR NOTIFICACIONES:",err);
-            return res.json([]);
+            if(err){
+
+                console.log("ERROR NOTIFICACIONES:", err);
+
+                return res.json([]);
+
+            }
+
+
+            console.log("RESULTADO NOTIFICACIONES:", result);
+
+            res.json(result);
+
         }
-
-        console.log("NOTIFICACIONES ENCONTRADAS:", result);
-
-        res.json(result);
-
-    });
+    );
 
 });
+
 
 // ============================
 // 🔥 DOCENTES
