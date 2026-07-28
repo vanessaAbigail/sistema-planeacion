@@ -680,26 +680,35 @@ app.post('/crear-notificacion', (req, res) => {
 
 });
 
-app.get('/notificaciones/:id', (req, res) => {
 
-    console.log("ENTRE A LA RUTA DE NOTIFICACIONES ");
+
+// 🔔 NOTIFICACIONES ADMIN
+app.get('/notificaciones/:id', (req,res)=>{
 
     const id = req.params.id;
 
-    console.log("ID:", id);
+    console.log("CONSULTANDO NOTIFICACIONES ADMIN:", id);
 
-   db.query(
-    "SELECT * FROM notificaciones WHERE id_usuario = ? AND leida = 0 ORDER BY fecha DESC",
-    [id],
-    (err, result) => {
+    db.query(
+    `
+    SELECT * 
+    FROM notificaciones
+    WHERE destinatario = 'admin'
+    AND leida = 0
+    ORDER BY fecha DESC
+    `,
+    (err,result)=>{
 
-            console.log("ERROR:", err);
-            console.log("RESULTADO:", result);
-
-            res.json(result);
-
+        if(err){
+            console.log("ERROR NOTIFICACIONES:",err);
+            return res.json([]);
         }
-    );
+
+        console.log("NOTIFICACIONES ENCONTRADAS:", result);
+
+        res.json(result);
+
+    });
 
 });
 

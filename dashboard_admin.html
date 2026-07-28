@@ -152,7 +152,7 @@ function cargarNotificacionesAdmin(){
 
     console.log("Consultando:", `${API}/notificaciones/2`);
 
-fetch(`${API}/notificaciones/${adminId}`)
+fetch(`${API}/notificaciones/${usuario.id}`)
     .then(res => res.json())
     .then(data => {
 
