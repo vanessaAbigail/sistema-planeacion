@@ -14,20 +14,7 @@
 
 <body class="panel-body">
 
-<!-- 🔒 SOLO ADMIN -->
-<script>
 
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-if(!usuario || usuario.tipo !== "administrador"){
-
-alert("⚠️ Acceso solo administrador");
-
-window.location = "login.html";
-
-}
-
-</script>
 
 <!-- 🔥 SIDEBAR ADMIN -->
 <div class="sidebar">
@@ -162,15 +149,36 @@ Grupos
 <script>
 
 // 🔥 ADMIN ID
-const adminId = "admin";
-
 const API = window.location.origin;
+
+
+// ======================
+// VALIDAR ADMIN
+// ======================
+
+const usuario = JSON.parse(
+localStorage.getItem("usuario")
+);
+
+
+if(!usuario || usuario.tipo !== "administrador"){
+
+alert("⚠️ Acceso solo administrador");
+
+window.location = "login.html";
+
+}
+
+
+const adminId = usuario.id;
 
 // 🔥 CARGAR DATOS ADMIN
 
 window.onload = function(){
 
-// 🔥 NOMBRE
+
+// DATOS ADMIN
+
 const datos =
 JSON.parse(
 localStorage.getItem(
@@ -178,29 +186,40 @@ localStorage.getItem(
 )
 );
 
+
 if(datos){
 
 document.getElementById("nombreAdmin").innerText =
 datos.nombre || "Administrador";
 
+
+document.getElementById("rolAdmin").innerText =
+datos.rol || "Administrador";
+
 }
 
-// 🔥 FOTO
+
+// FOTO ADMIN
+
 const foto =
 localStorage.getItem(
 "foto_admin_" + adminId
 );
 
-if(foto){
 
-document.getElementById(
-"fotoAdminSidebar"
-).src = foto;
+const defaultFoto =
+"img/perfiles/default.png";
 
-}
 
-// 🔥 MOSTRAR CARDS
+document.getElementById("fotoAdminSidebar").src =
+foto || defaultFoto;
+
+
+
+// MOSTRAR GRUPOS
+
 mostrar();
+
 
 }
 

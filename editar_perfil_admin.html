@@ -87,8 +87,18 @@ Cambiar Foto
 
 <script>
 
-const adminId = "admin";
+// ============================
+// VALIDAR USUARIO
+// ============================
 
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario){
+    alert("Debe iniciar sesión.");
+    window.location = "login.html";
+}
+
+const adminId = usuario.id;
 
 // ============================
 // CAMBIAR FOTO
@@ -96,42 +106,30 @@ const adminId = "admin";
 
 document.getElementById("inputFoto").addEventListener("change", function(e){
 
-const file = e.target.files[0];
+    const file = e.target.files[0];
 
-if(file){
+    if(file){
 
-const reader = new FileReader();
+        const reader = new FileReader();
 
-reader.onload = function(e){
+        reader.onload = function(event){
 
-const imagen = e.target.result;
+            const imagen = event.target.result;
 
+            // Guardar foto
+            localStorage.setItem("foto_admin_" + adminId, imagen);
 
-// GUARDAR FOTO ADMINISTRADOR
+            // Actualizar vistas
+            document.getElementById("preview").src = imagen;
+            document.getElementById("fotoUsuario").src = imagen;
 
-localStorage.setItem(
-"foto_admin_admin",
-imagen
-);
+        };
 
+        reader.readAsDataURL(file);
 
-// ACTUALIZAR IMÁGENES
-
-document.getElementById("preview").src = imagen;
-
-document.getElementById("fotoUsuario").src = imagen;
-
-
-};
-
-
-reader.readAsDataURL(file);
-
-}
+    }
 
 });
-
-
 
 // ============================
 // GUARDAR PERFIL
@@ -139,44 +137,29 @@ reader.readAsDataURL(file);
 
 function guardarAdmin(e){
 
-e.preventDefault();
+    e.preventDefault();
 
+    const datos = {
 
-const datos = {
+        nombre: document.getElementById("nombre").value,
+        correo: document.getElementById("correo").value,
+        telefono: document.getElementById("telefono").value,
+        area: document.getElementById("area").value,
+        matricula: document.getElementById("matricula").value,
+        rol: document.getElementById("rol").value
 
-nombre: document.getElementById("nombre").value,
+    };
 
-correo: document.getElementById("correo").value,
+    localStorage.setItem(
+        "perfil_admin_" + adminId,
+        JSON.stringify(datos)
+    );
 
-telefono: document.getElementById("telefono").value,
+    alert("Perfil actualizado correctamente ✅");
 
-area: document.getElementById("area").value,
-
-matricula: document.getElementById("matricula").value,
-
-rol: document.getElementById("rol").value
-
-};
-
-
-// GUARDAR PERFIL ADMIN
-
-localStorage.setItem(
-"perfil_admin_admin",
-JSON.stringify(datos)
-);
-
-
-
-alert("Perfil actualizado correctamente ✅");
-
-
-window.location = "perfil_admin.html";
-
+    window.location = "perfil_admin.html";
 
 }
-
-
 
 // ============================
 // CARGAR DATOS
@@ -184,75 +167,48 @@ window.location = "perfil_admin.html";
 
 window.onload = function(){
 
+    // Perfil
+    const datos = JSON.parse(
+        localStorage.getItem("perfil_admin_" + adminId)
+    );
 
+    if(datos){
 
-const datos = JSON.parse(
-localStorage.getItem("perfil_admin_admin")
-);
+        document.getElementById("nombre").value = datos.nombre || "";
+        document.getElementById("correo").value = datos.correo || "";
+        document.getElementById("telefono").value = datos.telefono || "";
+        document.getElementById("area").value = datos.area || "";
+        document.getElementById("matricula").value = datos.matricula || "";
+        document.getElementById("rol").value = datos.rol || "Administrador";
 
+    }
 
+    // Foto
+    const foto = localStorage.getItem("foto_admin_" + adminId);
 
-if(datos){
+    if(foto){
 
+        document.getElementById("preview").src = foto;
+        document.getElementById("fotoUsuario").src = foto;
 
-nombre.value = datos.nombre || "";
-
-correo.value = datos.correo || "";
-
-telefono.value = datos.telefono || "";
-
-area.value = datos.area || "";
-
-matricula.value = datos.matricula || "";
-
-rol.value = datos.rol || "Administrador";
-
-
-}
-
-
-
-
-// CARGAR FOTO
-
-const foto = localStorage.getItem(
-"foto_admin_admin"
-);
-
-
-
-if(foto){
-
-
-preview.src = foto;
-
-fotoUsuario.src = foto;
-
+    }
 
 }
-
-
-}
-
-
 
 // ============================
-// MENU USUARIO
+// MENÚ
 // ============================
 
 function toggleMenu(){
 
-let menu = document.getElementById("menuUsuario");
+    const menu = document.getElementById("menuUsuario");
 
-
-menu.style.display = 
-menu.style.display === "block" 
-? "none" 
-: "block";
-
+    menu.style.display =
+        menu.style.display === "block"
+        ? "none"
+        : "block";
 
 }
-
 
 </script>
 <a href="dashboard_admin.html" class="btn-menu">

@@ -14,21 +14,6 @@
 
 <body class="panel-body">
 
-<!-- 🔒 SOLO ADMIN -->
-
-<script>
-
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-if(!usuario || usuario.tipo !== "administrador"){
-
-alert("⚠️ Acceso solo administrador");
-
-window.location = "login.html";
-
-}
-
-</script>
 
 <!-- SIDEBAR -->
 
@@ -124,7 +109,7 @@ placeholder="🔍 Buscar docente..."
 onkeyup="filtrar()"
 >
 
-<table class="tabla">
+<table class="tabla tabla-docentes">
 
 <thead>
 
@@ -143,132 +128,144 @@ onkeyup="filtrar()"
 
 <script>
 
-// VALIDAR ADMIN
-
-const adminUser =
-JSON.parse(localStorage.getItem("usuario"));
-
 const API = window.location.origin;
 
-if(!adminUser || adminUser.tipo !== "administrador"){
 
-alert("⚠️ Acceso solo administrador");
+// ======================
+// VALIDAR ADMIN
+// ======================
 
-window.location = "login.html";
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+
+if (!usuario || usuario.tipo !== "administrador") {
+
+    alert("⚠️ Acceso solo administrador");
+
+    window.location = "login.html";
 
 }
 
-// ID ADMIN
 
-const adminId = "admin";
+const adminId = usuario.id;
 
-// INICIAR
+
+
+// ======================
+// INICIAR PÁGINA
+// ======================
 
 function iniciarPagina(){
 
-// DATOS ADMIN
 
-const datos =
-JSON.parse(localStorage.getItem("perfil_admin_" + adminId));
+    // DATOS DEL ADMINISTRADOR
 
-if(datos){
+    const datos = JSON.parse(
+        localStorage.getItem("perfil_admin_" + adminId)
+    );
 
-document.getElementById("nombreAdmin").innerText =
-datos.nombre || "Administrador";
 
-document.getElementById("rolAdmin").innerText =
-"Administrador";
+    if(datos){
+
+        document.getElementById("nombreAdmin").innerHTML =
+        datos.nombre || "Administrador";
+
+
+        document.getElementById("rolAdmin").innerHTML =
+        datos.rol || "Administrador";
+
+    }
+
+
+
+    // FOTO DEL ADMINISTRADOR
+
+    const foto = localStorage.getItem(
+        "foto_admin_" + adminId
+    );
+
+
+    const defaultFoto =
+    "img/perfiles/default.png";
+
+
+    document.getElementById("fotoAdminSidebar").src =
+    foto || defaultFoto;
+
+
+
+    cargarDocentes();
 
 }
-
-// FOTO ADMIN
-
-const foto =
-localStorage.getItem("foto_admin_" + adminId);
-
-if(foto){
-
-document.getElementById("fotoAdminSidebar").src =
-foto;
-
-}
-
+// ======================
 // CARGAR DOCENTES
+// ======================
+function cargarDocentes() {
 
-cargarDocentes();
+    fetch(`${API}/docentes`)
+    .then(res => res.json())
+    .then(data => {
 
-}
+        const tabla = document.getElementById("lista");
 
-// CARGAR DOCENTES
+        tabla.innerHTML = "";
 
-function cargarDocentes(){
+        data.forEach(d => {
 
-fetch(`${API}/docentes`)
+            tabla.innerHTML += `
+                <tr>
+                    <td>${d.nombre}</td>
+                    <td>${d.carrera || "Sin asignar"}</td>
+                </tr>
+            `;
 
-.then(res => res.json())
+        });
 
-.then(data => {
-
-let tabla =
-document.getElementById("lista");
-
-tabla.innerHTML = "";
-
-data.forEach(d => {
-
-tabla.innerHTML += `
-
-<tr>
-
-<td>${d.nombre}</td>
-
-<td>${d.carrera || "Sin asignar"}</td>
-
-</tr>
-
-`;
-
-});
-
-});
+    })
+    .catch(error => {
+        console.log(error);
+        alert("Error al cargar docentes.");
+    });
 
 }
 
+// ======================
 // BUSCADOR
+// ======================
+function filtrar() {
 
-function filtrar(){
+    const texto = document
+        .getElementById("buscador")
+        .value
+        .toLowerCase();
 
-let input =
-document.getElementById("buscador")
-.value
-.toLowerCase();
+    const filas = document.querySelectorAll("#lista tr");
 
-let filas =
-document.querySelectorAll("#lista tr");
+    filas.forEach(fila => {
 
-filas.forEach(f => {
+        fila.style.display =
+            fila.innerText.toLowerCase().includes(texto)
+            ? ""
+            : "none";
 
-f.style.display =
-f.innerText.toLowerCase().includes(input)
-? ""
-: "none";
-
-});
+    });
 
 }
 
+// ======================
 // CERRAR SESIÓN
+// ======================
+function cerrarSesion() {
 
-function cerrarSesion(){
+    localStorage.removeItem("usuario");
 
-localStorage.removeItem("usuario");
-
-window.location = "login.html";
+    window.location = "login.html";
 
 }
 
-// INICIAR TODO
-
+// ======================
+// INICIAR
+// ======================
 window.onload = iniciarPagina;
 
 </script>

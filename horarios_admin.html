@@ -9,15 +9,6 @@
 
 <body class="panel-body">
 
-<!-- 🔒 PROTEGER ADMIN -->
-<script>
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-if(!usuario || usuario.tipo !== "administrador"){
-  alert("⚠️ Acceso solo administrador");
-  window.location = "login.html";
-}
-</script>
 
 <!-- SIDEBAR ADMIN -->
 <div class="sidebar">
@@ -93,32 +84,72 @@ style="padding:10px; width:250px; border-radius:8px; border:1px solid #ccc;">
 </div>
 
 <script>
-
-
 const API = window.location.origin;
+
+
+// ======================
+// VALIDAR ADMIN
+// ======================
+
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+
+if(!usuario || usuario.tipo !== "administrador"){
+
+    alert("⚠️ Acceso solo administrador");
+
+    window.location = "login.html";
+
+}
+
+
+const adminId = usuario.id;
 
 window.onload = function(){
 
-// PERFIL
-const datos = JSON.parse(localStorage.getItem("perfil_admin_admin"));
+
+// PERFIL ADMIN
+
+const datos = JSON.parse(
+    localStorage.getItem("perfil_admin_" + adminId)
+);
+
 
 if(datos){
-document.getElementById("nombreAdmin").innerText = datos.nombre || "Administrador";
+
+document.getElementById("nombreAdmin").innerText =
+datos.nombre || "Administrador";
+
+
+document.getElementById("rolAdmin").innerText =
+datos.rol || "Administrador";
+
 }
+
+
 
 // FOTO ADMINISTRADOR
-const foto = localStorage.getItem("foto_admin_admin");
 
-const defaultFoto = "img/perfiles/default.png";
+const foto = localStorage.getItem(
+"foto_admin_" + adminId
+);
+
+
+const defaultFoto =
+"img/perfiles/default.png";
+
 
 document.getElementById("fotoAdminSidebar").src =
-foto ? foto : defaultFoto;
+foto || defaultFoto;
 
-// 🔥 CARGAR HORARIOS
+
+
+// CARGAR HORARIOS
+
 cargarHorarios();
 
-}
 
+}
 // 🔥 FUNCIÓN NUEVA
 function cargarHorarios(){
 

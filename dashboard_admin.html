@@ -109,11 +109,17 @@ const API = window.location.origin;
 const usuario = JSON.parse(localStorage.getItem("usuario"));
 
 if(!usuario || usuario.tipo !== "administrador"){
-alert("Acceso solo administrador");
-window.location = "login.html";
+    alert("Acceso solo administrador");
+    window.location = "login.html";
 }
 
 const adminId = usuario.id;
+
+console.log("ADMIN ID:", adminId);
+
+console.log(
+localStorage.getItem("foto_admin_" + adminId)
+);
 
 // 🔥 FUNCIÓN PRINCIPAL (TODO EN UNA)
 function iniciarDashboard(){

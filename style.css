@@ -2744,3 +2744,18 @@ transform:scale(1.05);
     margin-bottom:25px;
 
 }
+
+/* ==========================
+   TABLA DOCENTES CENTRADA
+========================== */
+
+.tabla-docentes{
+    width: 70%;
+    margin: 30px auto;
+}
+
+
+.tabla-docentes th,
+.tabla-docentes td{
+    text-align: center;
+}
