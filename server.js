@@ -852,14 +852,14 @@ app.put("/estado-planeacion/:id", (req, res) => {
                     const idDocente = result[0].id_usuario;
 
                     // 🔔 Crear notificación para el docente
-                    db.query(
-                        `INSERT INTO notificaciones
-                        (id_usuario, destinatario, mensaje)
-                        VALUES (?, 'docente', ?)`,
-                        [
-                            idDocente,
-                            `📄 Tu planeación fue ${estado}.`
-                        ],
+                   db.query(
+    `INSERT INTO notificaciones
+    (id_usuario, mensaje)
+    VALUES (?, ?)`,
+    [
+        idDocente,
+        `📄 Tu planeación fue ${estado}.`
+    ],
                         (err3) => {
 
                             if (err3) {
