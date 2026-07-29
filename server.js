@@ -448,7 +448,7 @@ db.query(
 [
 idAdmin,
 "admin",
-`📄 ${nombreDocente} envió una nueva planeación`
+`📄Se creo una nueva planeación`
 ],
 (err3)=>{
 
