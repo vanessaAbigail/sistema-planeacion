@@ -177,7 +177,7 @@ fetch(`${API}/notificaciones/${usuario.id}`)
 // 🔔 VER NOTIFICACIONES
 function verNotificacionesAdmin(){
 
-fetch(`${API}/notificaciones/${adminId}`)
+fetch(`${API}/notificaciones/${usuario.id}`)
 .then(res => res.json())
 .then(data => {
 

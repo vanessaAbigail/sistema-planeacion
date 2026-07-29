@@ -171,6 +171,16 @@ db.connect(err => {
   console.log("✅ Conectado a MySQL");
 });
 
+db.query("DESCRIBE notificaciones", (err, rows) => {
+  if (err) {
+    console.log("ERROR DESCRIBE:", err);
+  } else {
+    console.log("ESTRUCTURA TABLA NOTIFICACIONES:");
+    console.table(rows);
+  }
+});
+
+
 // 🔹 Middleware
 app.use(cors());
 app.use(express.json());
@@ -681,46 +691,36 @@ app.post('/crear-notificacion', (req, res) => {
 });
 
 
-// 🔔 NOTIFICACIONES
-app.get('/notificaciones/:id', (req, res) => {
+
+// 🔔 NOTIFICACIONES ADMIN
+app.get('/notificaciones/:id', (req,res)=>{
 
     const id = req.params.id;
 
-    console.log("CONSULTANDO NOTIFICACIONES PARA:", id);
-
+    console.log("CONSULTANDO NOTIFICACIONES ADMIN:", id);
 
     db.query(
-        `
-        SELECT *
-        FROM notificaciones
-        WHERE 
-        (destinatario = 'admin' AND ? = 1)
-        OR
-        (destinatario = 'docente' AND id_usuario = ?)
-        AND leida = 0
-        ORDER BY fecha DESC
-        `,
-        [id, id],
-        (err, result) => {
+    `
+    SELECT * 
+    FROM notificaciones
+    WHERE destinatario = 'admin'
+    AND leida = 0
+    ORDER BY fecha DESC
+    `,
+    (err,result)=>{
 
-            if(err){
-
-                console.log("ERROR NOTIFICACIONES:", err);
-
-                return res.json([]);
-
-            }
-
-
-            console.log("RESULTADO NOTIFICACIONES:", result);
-
-            res.json(result);
-
+        if(err){
+            console.log("ERROR NOTIFICACIONES:",err);
+            return res.json([]);
         }
-    );
+
+        console.log("NOTIFICACIONES ENCONTRADAS:", result);
+
+        res.json(result);
+
+    });
 
 });
-
 
 // ============================
 // 🔥 DOCENTES
