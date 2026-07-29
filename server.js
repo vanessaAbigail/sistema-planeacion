@@ -186,6 +186,15 @@ db.query("SHOW CREATE TABLE notificaciones", (err, result) => {
 
 });
 
+
+db.query("SELECT @@hostname AS host, @@port AS puerto, DATABASE() AS bd", (err, result) => {
+    console.log(result);
+});
+
+
+console.log("BASE DE DATOS ACTUAL:", process.env.DB_NAME);
+console.log("HOST ACTUAL:", process.env.DB_HOST);
+console.log("PUERTO ACTUAL:", process.env.DB_PORT);
 // 🔹 Middleware
 app.use(cors());
 app.use(express.json());
