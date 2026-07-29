@@ -171,15 +171,20 @@ db.connect(err => {
   console.log("✅ Conectado a MySQL");
 });
 
-db.query("DESCRIBE notificaciones", (err, rows) => {
-  if (err) {
-    console.log("ERROR DESCRIBE:", err);
-  } else {
-    console.log("ESTRUCTURA TABLA NOTIFICACIONES:");
-    console.table(rows);
-  }
+db.query("SELECT DATABASE() AS bd", (err, result) => {
+    console.log("BASE DE DATOS:", result[0].bd);
 });
 
+db.query("SHOW CREATE TABLE notificaciones", (err, result) => {
+
+    if (err) {
+        console.log("ERROR SHOW CREATE:", err);
+    } else {
+        console.log("TABLA NOTIFICACIONES:");
+        console.log(result[0]["Create Table"]);
+    }
+
+});
 
 // 🔹 Middleware
 app.use(cors());
