@@ -355,25 +355,24 @@ app.post("/guardar-planeacion", upload.single("archivo"), async (req, res) => {
   console.log("Datos recibidos:");
   console.log(req.body);
 
-console.log("MATERIA:", req.body.materia);
-console.log("GRUPO:", req.body.grupo);
-
+  console.log("MATERIA:", req.body.materia);
+  console.log("GRUPO:", req.body.grupo);
   console.log("FILE:", req.file);
 
- const { 
-    periodo, 
-    carrera, 
+  const {
+    periodo,
+    carrera,
     grupo,
     materia,
-    fecha, 
-    id_usuario 
-} = req.body;
+    fecha,
+    id_usuario
+  } = req.body;
 
   let linkDrive = null;
 
   try {
 
-    // ☁️ SUBIR A DRIVE
+    // ☁️ Subir archivo a Google Drive
     if (req.file) {
 
       console.log("☁️ Subiendo archivo a Drive...");
@@ -385,104 +384,119 @@ console.log("GRUPO:", req.body.grupo);
 
       console.log("☁️ Resultado Drive:", resultado);
 
-      console.log("🔓 Haciendo público...");
-
       linkDrive = await hacerPublico(resultado.id);
 
       console.log("🔗 Link generado:", linkDrive);
 
-      // borrar archivo local
+      // Eliminar archivo temporal
       fs.unlinkSync(req.file.path);
     }
 
-    // 💾 GUARDAR EN BASE DE DATOS
-    db.query(`
-     INSERT INTO planeaciones
-(
-periodo,
-carrera,
-grupo,
-materia,
-fecha,
-id_usuario,
-archivo
-)
-VALUES (?,?,?,?,?,?,?)
-    `, [
-periodo,
-carrera,
-grupo,
-materia,
-fecha,
-id_usuario,
-linkDrive
-], (err, result) => {
+    // 💾 Guardar planeación
+    db.query(
+      `INSERT INTO planeaciones
+      (
+        periodo,
+        carrera,
+        grupo,
+        materia,
+        fecha,
+        id_usuario,
+        archivo
+      )
+      VALUES (?,?,?,?,?,?,?)`,
+      [
+        periodo,
+        carrera,
+        grupo,
+        materia,
+        fecha,
+        id_usuario,
+        linkDrive
+      ],
+      (err, result) => {
 
-      if (err) {
-        console.log("❌ ERROR MYSQL:", err);
+        if (err) {
+          console.log("❌ ERROR MYSQL:", err);
 
-        return res.status(500).json({
-          status: "error",
-          mensaje: "Error al guardar en base de datos",
-          debug: err
-        });
+          return res.status(500).json({
+            status: "error",
+            mensaje: "Error al guardar la planeación"
+          });
+        }
+
+        console.log("✅ Guardado en BD correctamente");
+
+        // ============================
+        // 🔔 Crear notificación para el administrador
+        // ============================
+
+        db.query(
+          "SELECT id FROM usuarios WHERE tipo = 'administrador' LIMIT 1",
+          (errAdmin, adminData) => {
+
+            if (errAdmin) {
+              console.log("❌ Error buscando administrador:", errAdmin);
+            }
+            else if (adminData.length === 0) {
+              console.log("⚠️ No existe ningún administrador.");
+            }
+            else {
+
+              const idAdmin = adminData[0].id;
+
+              console.log("ID ADMIN:", idAdmin);
+
+              db.query(
+                `INSERT INTO notificaciones
+                (id_usuario, destinatario, mensaje, leida)
+                VALUES (?, ?, ?, ?)`,
+                [
+                  idAdmin,
+                  "admin",
+                  "📄 Se creó una nueva planeación",
+                  0
+                ],
+                (errNoti, resultNoti) => {
+
+                  if (errNoti) {
+                    console.log("❌ Error al guardar notificación:", errNoti);
+                  } else {
+                    console.log("✅ Notificación guardada");
+                    console.log(resultNoti);
+                  }
+
+                }
+              );
+
+            }
+
+            // Responder aunque falle la notificación
+            return res.status(200).json({
+              status: "ok",
+              mensaje: "Planeación guardada correctamente",
+              link: linkDrive
+            });
+
+          }
+        );
+
       }
-
-      console.log("✅ Guardado en BD correctamente");
-
-      // 🔔 NOTIFICACIÓN
-db.query(
-"SELECT id FROM usuarios WHERE tipo='administrador'",
-(errAdmin, adminData)=>{
-
-if(errAdmin || adminData.length===0){
-console.log("No existe administrador");
-return;
-}
-
-const idAdmin = adminData[0].id;
-
-
-db.query(
-"INSERT INTO notificaciones (id_usuario, destinatario, mensaje) VALUES (?, ?, ?)",
-[
-idAdmin,
-"admin",
-`📄Se creo una nueva planeación`
-],
-(err3)=>{
-
-if(err3){
-console.log("❌ Error notificación:",err3);
-}else{
-console.log("✅ Notificación guardada");
-}
-
-});
-
-
-});
-      // 🔥 RESPUESTA FINAL (IMPORTANTE)
-      return res.status(200).json({
-        status: "ok",
-        mensaje: "Planeación guardada correctamente",
-        link: linkDrive || null
-      });
-
-    });
+    );
 
   } catch (error) {
+
     console.log("❌ ERROR DRIVE:", error);
 
     return res.status(500).json({
       status: "error",
-      mensaje: "Error en Drive",
+      mensaje: "Error al subir archivo a Google Drive",
       debug: error.message
     });
+
   }
 
 });
-
 
 // 🔥 TODAS (ADMIN)
 app.get('/planeaciones', (req, res) => {
@@ -691,13 +705,10 @@ app.post('/crear-notificacion', (req, res) => {
 });
 
 
-
 // 🔔 NOTIFICACIONES ADMIN
 app.get('/notificaciones/:id', (req,res)=>{
 
-    const id = req.params.id;
-
-    console.log("CONSULTANDO NOTIFICACIONES ADMIN:", id);
+    console.log("CONSULTANDO NOTIFICACIONES ADMIN");
 
     db.query(
     `

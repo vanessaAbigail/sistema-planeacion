@@ -193,7 +193,7 @@ alert(mensajes || "Sin notificaciones");
 fetch(`${API}/leer-notificaciones`,{
 method: "POST",
 headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ id_usuario: adminId })
+body: JSON.stringify({ id_usuario: usuario.id })
 })
 .then(() => {
   document.getElementById("contadorAdmin").innerText = 0;
